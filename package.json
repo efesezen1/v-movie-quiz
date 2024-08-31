@@ -9,6 +9,7 @@
       "preview": "vite preview"
    },
    "dependencies": {
+      "@neoconfetti/vue": "^2.2.1",
       "@primevue/themes": "^4.0.5",
       "@tanstack/vue-query": "^5.53.1",
       "@tanstack/vue-query-devtools": "^5.53.1",
@@ -29,6 +30,7 @@
       "unplugin-auto-import": "^0.18.2",
       "unplugin-vue-components": "^0.27.4",
       "vite": "^5.4.1",
+      "vite-plugin-vue-devtools": "^7.3.9",
       "vue-tsc": "^2.0.29"
    }
 }

@@ -8,15 +8,20 @@
    <div class="w-full bg-orange-400 text-xl px-4 py-2 flex flex-row">
       <div v-for="(item, index) in data" class="mx-auto">
          <div
-            class="bg-slate-100 text-slate-900 rounded-full w-[30px] h-[30px] flex justify-center items-center cursor-pointer transition-all duration-300 text-sm overflow-y-scroll"
+            class="bg-white text-slate-900 rounded-full w-[30px] h-[30px] flex justify-center items-center transition-all duration-300 text-sm overflow-y-scroll"
             :class="{
-               'bg-green-500': item.isAnsweredTrue,
-               'bg-red-500 text-slate-100':
+               'border-4 border-green-500': item.isAnsweredTrue,
+               'border-4 border-red-500 text-slate-900':
                   item.questionStatus === 'answered' && !item.isAnsweredTrue,
-               'bg-slate-300 text-slate-900':
+               'border-4 border-slate-300 text-slate-900':
                   item.questionStatus === 'unanswered',
                'opacity-80': cursor !== index,
+               ...(gameOver
+                  ? { 'cursor-default': true }
+                  : { 'cursor-pointer': true }),
             }"
+            @click="moveCursor('to', index)"
+            :disabled="gameOver"
          >
             <small>{{ index + 1 }}</small>
          </div>
@@ -62,34 +67,43 @@
             @click="moveCursor('pass', cursor)"
          />
       </div>
+      <div v-if="explode">
+         <div v-confetti></div>
+      </div>
    </div>
 </template>
 
 <script setup>
 import mockData from '../utils/MockData'
+import { vConfetti } from '@neoconfetti/vue'
 let data = ref([])
-
+const gameOver = ref(false)
+const explode = ref(false)
 const moveCursor = (navigation, currentIndex) => {
+   if (data.value.every((item) => item.questionStatus === 'answered')) {
+      console.log('All questions have been answered')
+      gameOver.value = true
+      data.value.filter((item) => item.questionStatus === 'answered').length >
+         5 && (explode.value = true)
+      return
+   }
    if (navigation === 'next') {
       console.log(`Moving cursor to the ${navigation} question`)
-      if (data.value.every((item) => item.questionStatus === 'answered')) {
-         console.log('All questions have been answered')
-         return
-      }
       while (data.value[currentIndex].questionStatus === 'answered') {
          currentIndex = (currentIndex + 1) % data.value.length
       }
       console.log(`Moving to question ${currentIndex + 1}`)
-
       cursor.value = currentIndex
    }
-
    if (navigation === 'pass') {
       console.log(`Moving cursor to the next unanswered question`)
       currentIndex = (currentIndex + 1) % data.value.length
       while (data.value[currentIndex].questionStatus === 'answered') {
          currentIndex = (currentIndex + 1) % data.value.length
       }
+      cursor.value = currentIndex
+   }
+   if (navigation === 'to') {
       cursor.value = currentIndex
    }
 }
