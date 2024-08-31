@@ -1,8 +1,11 @@
-import { createApp } from 'vue'
+import { createApp, provide } from 'vue'
 import './style.css'
+import $http from './utils/AxiosSetup'
 import App from './App.vue'
+import $http from '@/utils/AxiosSetup'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import PrimeVue from 'primevue/config'
+import 'primeicons/primeicons.css'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import Aura from '@primevue/themes/aura'
 import Home from './pages/Home.vue'
@@ -25,4 +28,9 @@ const router = createRouter({
 
 const app = createApp(App)
 
-app.use(PrimeVue, presetOptions).use(VueQueryPlugin).use(router).mount('#app')
+app.use(PrimeVue, presetOptions)
+   .provide('$http', $http)
+   .use(VueQueryPlugin)
+   .use(router)
+   .provide('$http', $http)
+   .mount('#app')
