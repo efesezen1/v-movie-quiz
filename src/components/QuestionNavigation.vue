@@ -47,7 +47,7 @@
                   ? item.index + 1
                   : item.questionStatus === 'answered' && !item.isAnsweredTrue
                   ? '✘'
-                  : item.isAnsweredTrue && '✔︎'
+                  : item.isAnsweredTrue && '✔'
             }}</small>
          </div>
       </template>
@@ -78,18 +78,6 @@ const questionsStyling = (item, index) => ({
 })
 
 const items = ref([
-   //    {
-   //       label: 'Add',
-   //       icon: 'pi pi-pencil',
-   //       command: () => {
-   //          //   toast.add({
-   //          //      severity: 'info',
-   //          //      summary: 'Add',
-   //          //      detail: 'Data Added',
-   //          //      life: 3000,
-   //          //   })
-   //       },
-   //    },
    ...data.value.map((item, index) => ({
       ...item,
       index,

@@ -19,49 +19,56 @@
    </div>
 
    <div v-else-if="gameStatus === 'started'">
-      <QuestionNavigation
-         :data="data"
-         :cursor="cursor"
-         @question:clicked="moveCursor"
-         :key="cursor"
-         v-model:display="qNavVisible"
-      />
-      <div class="flex flex-col items-center relative h-[70vh] justify-center">
-         <div v-html="currentQuestion" class="w-10/12"></div>
-
+      <div v-if="isLoading" class="flex justify-center items-center h-[94vh]">
+         <ProgressSpinner class=" "></ProgressSpinner>
+      </div>
+      <div v-else>
+         <QuestionNavigation
+            :data="data"
+            :cursor="cursor"
+            @question:clicked="moveCursor"
+            :key="cursor"
+            v-model:display="qNavVisible"
+         />
          <div
-            class="flex flex-col gap-4 w-full justify-center items-center my-4"
+            class="flex flex-col items-center relative h-[70vh] justify-center"
          >
-            <Button
-               class="w-10/12"
-               :outlined="!option.isSelected"
-               v-for="option in currentOptions"
-               :key="option.text"
-               :disabled="option.isButtonDisabled"
-               :label="option.text"
-               @click="answer(data[cursor], option)"
-               :severity="
-                  option.isSelected === true
-                     ? option.isAnswer === false
-                        ? 'danger'
-                        : 'success'
-                     : 'info'
-               "
-            />
-         </div>
-         <div>
-            <span class="underline">
-               <i class="pi pi-star-fill text-yellow-500"></i> {{ score }}
-            </span>
-         </div>
-         <div class="w-10/12 flex justify-end">
-            <Button
-               severity="warn"
-               class="text-slate-100"
-               icon="pi pi-angle-double-right"
-               label="Pass"
-               @click="moveCursor('pass', cursor)"
-            />
+            <div v-html="currentQuestion" class="w-10/12"></div>
+
+            <div
+               class="flex flex-col gap-4 w-full justify-center items-center my-4"
+            >
+               <Button
+                  class="w-10/12"
+                  :outlined="!option.isSelected"
+                  v-for="option in currentOptions"
+                  :key="option.text"
+                  :disabled="option.isButtonDisabled"
+                  :label="option.text"
+                  @click="answer(data[cursor], option)"
+                  :severity="
+                     option.isSelected === true
+                        ? option.isAnswer === false
+                           ? 'danger'
+                           : 'success'
+                        : 'info'
+                  "
+               />
+            </div>
+            <div>
+               <span class="underline">
+                  <i class="pi pi-star-fill text-yellow-500"></i> {{ score }}
+               </span>
+            </div>
+            <div class="w-10/12 flex justify-end">
+               <Button
+                  severity="warn"
+                  class="text-slate-100"
+                  icon="pi pi-angle-double-right"
+                  label="Pass"
+                  @click="moveCursor('pass', cursor)"
+               />
+            </div>
          </div>
       </div>
    </div>
@@ -91,21 +98,75 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, toRaw } from 'vue'
 import TriviaTitle from '../components/TriviaTitle.vue'
 import mockData from '../utils/MockData'
 import { vConfetti } from '@neoconfetti/vue'
+import { useQuery } from '@tanstack/vue-query'
+import axios from 'axios'
 const qNavVisible = ref(false)
-let data = ref([])
-const gameStatus = ref('started')
 
-watch(gameStatus, (value, oldValue) => {
-   if (oldValue !== 'started' && value === 'started') {
-      setTimeout(() => {
-         qNavVisible.value = true
-      }, 500)
-   }
+const gameStatus = ref('started')
+const data = ref([])
+const {
+   data: queryData,
+   isLoading,
+   isError,
+   error,
+} = useQuery({
+   queryKey: ['questions'],
+   queryFn: async () => {
+      try {
+         const response = await axios.get(
+            'https://the-trivia-api.com/api/questions?limit=10'
+         )
+         const data = response.data
+         console.log(data)
+         const optimizedData = data.map((item, index) => {
+            const options_ = shuffle([
+               ...item.incorrectAnswers,
+               item.correctAnswer,
+            ])
+            const options = options_.map((option, index) => {
+               return {
+                  isAnswer: option === item.correctAnswer,
+                  text: option,
+                  isSelected: false,
+                  isButtonDisabled: false,
+               }
+            })
+            return {
+               isAnsweredTrue: false,
+               question: item.question,
+               options,
+               questionStatus: 'unanswered',
+            }
+         })
+         data.value = optimizedData
+         return optimizedData
+      } catch (error) {
+         throw new Error(error.message)
+      }
+   },
 })
+watch(queryData, () => {
+   data.value = toRaw(queryData.value ?? [])
+})
+
+watch(
+   [gameStatus, isLoading],
+   ([value, isLoadingVal], [oldValue, isLoadingOldVal]) => {
+      if (oldValue !== 'started' && value === 'started' && !isLoadingVal) {
+         console.log('isLoadingVal', isLoadingVal)
+         setTimeout(() => {
+            qNavVisible.value = true
+         }, 1000)
+      }
+   },
+   {
+      immediate: true,
+   }
+)
 
 const finishGame = () => {
    gameStatus.value = 'over'
@@ -149,31 +210,33 @@ const score = computed(() => {
 let cursor = ref(0)
 
 const currentQuestion = computed(() => {
+   if (data.value.length === 0) return ''
    return data.value[cursor.value].question
 })
 const currentOptions = computed(() => {
+   if (data.value.length === 0) return []
    return data.value[cursor.value].options
 })
 
-const initData = () =>
-   mockData.map((item) => {
-      const options_ = shuffle([...item.incorrect_answers, item.correct_answer])
-      const options = options_.map((option, index) => {
-         return {
-            isAnswer: option === item.correct_answer,
-            text: option,
-            isSelected: false,
-            isButtonDisabled: false,
-         }
-      })
-      return {
-         isAnsweredTrue: false,
-         question: item.question,
-         options,
-         questionStatus: 'unanswered',
-      }
-   })
-data.value = initData()
+// const initData = () =>
+// mockData.map((item) => {
+//    const options_ = shuffle([...item.incorrectAnswers, item.correctAnswer])
+//    const options = options_.map((option, index) => {
+//       return {
+//          isAnswer: option === item.correctAnswer,
+//          text: option,
+//          isSelected: false,
+//          isButtonDisabled: false,
+//       }
+//    })
+//    return {
+//       isAnsweredTrue: false,
+//       question: item.question,
+//       options,
+//       questionStatus: 'unanswered',
+//    }
+// })
+// data.value = initData()
 
 const restart = () => {
    console.log('Restarting...')
