@@ -13,9 +13,11 @@ declare module 'vue' {
     Home: typeof import('./src/components/Home.vue')['default']
     Menu: typeof import('primevue/menu')['default']
     Menubar: typeof import('primevue/menubar')['default']
+    QuestionNavigation: typeof import('./src/components/QuestionNavigation.vue')['default']
     Quiz: typeof import('./src/components/Quiz.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SpeedDial: typeof import('primevue/speeddial')['default']
     TriviaDrawer: typeof import('./src/components/TriviaDrawer.vue')['default']
   }
   export interface ComponentCustomProperties {

@@ -1,78 +1,56 @@
 <template>
-   <!-- <div class="right-0 absolute bg-slate-100 text-slate-900 rounded-l">
-      <div class="text-xl px-4 py-2">Question {{ cursor }}</div>
-   </div> -->
+   <!-- <div
+      v-if="gameStatus === 'notStarted'"
+      class="w-full h-[90vh] bg-red-500 text-xl px-4 py-2 flex flex-row justify-center items-center"
+   ></div> -->
 
-   <div class="w-full  text-xl px-4 py-2 flex flex-row">
-      <div v-for="(item, index) in data" class="mx-auto">
+   <div v-if="gameStatus === 'notStarted'">
+      <QuestionNavigation
+         :data="data"
+         :cursor="cursor"
+         @question:clicked="moveCursor"
+         :key="cursor"
+      />
+      <div class="flex flex-col items-center relative h-[70vh] justify-center">
+         <div v-html="currentQuestion" class="w-10/12"></div>
+
          <div
-            class="bg-white text-slate-900 rounded-full w-[30px] h-[30px] flex justify-center items-center transition-all duration-300 text-sm overflow-y-scroll"
-            :class="{
-               'border-4 border-green-500': item.isAnsweredTrue,
-               'border-4 border-red-500 text-slate-900':
-                  item.questionStatus === 'answered' && !item.isAnsweredTrue,
-               'border-4 border-slate-300 text-slate-900':
-                  item.questionStatus === 'unanswered',
-               'opacity-80': cursor !== index,
-               ...(gameOver
-                  ? { 'cursor-default': true }
-                  : { 'cursor-pointer': true }),
-            }"
-            @click="moveCursor('to', index)"
-            :disabled="gameOver"
+            class="flex flex-col gap-4 w-full justify-center items-center my-4"
          >
-            <small>{{
-               item.questionStatus === 'unanswered'
-                  ? index + 1
-                  : item.questionStatus === 'answered' && !item.isAnsweredTrue
-                  ? '✘'
-                  : item.isAnsweredTrue && '✔'
-            }}</small>
+            <Button
+               class="w-10/12"
+               :outlined="!option.isSelected"
+               v-for="option in currentOptions"
+               :key="option.text"
+               :disabled="option.isButtonDisabled"
+               :label="option.text"
+               @click="answer(data[cursor], option)"
+               :severity="
+                  option.isSelected === true
+                     ? option.isAnswer === false
+                        ? 'danger'
+                        : 'success'
+                     : 'info'
+               "
+            />
          </div>
-      </div>
-   </div>
-   <div class="flex flex-col items-center relative h-[70vh] justify-center">
-      <div v-html="currentQuestion" class="w-10/12"></div>
-      <!-- {{ currentQuestion }} -->
-      <div class="flex flex-col gap-4 w-full justify-center items-center my-4">
-         <!-- v-for="option in currentOptions" -->
-
-         <Button
-            class="w-10/12"
-            :outlined="!option.isSelected"
-            v-for="option in currentOptions"
-            :key="option.text"
-            :disabled="option.isButtonDisabled"
-            :label="option.text"
-            @click="answer(data[cursor], option)"
-            :severity="
-               option.isSelected === true
-                  ? option.isAnswer === false
-                     ? 'danger'
-                     : 'success'
-                  : 'info'
-            "
-         />
-         <!-- @click="answer(option)" -->
-      </div>
-      <div>
-         <!-- {{ currentOptions }} -->
-         <span class="underline">
-            <!-- {{ currentQuestion.correct_answer }} -->
-            <i class="pi pi-star-fill text-yellow-400"></i> {{ score }}
-         </span>
-      </div>
-      <div class="w-10/12 flex justify-end">
-         <Button
-            severity="warn"
-            class="text-slate-100"
-            icon="pi pi-angle-double-right"
-            label="Pass"
-            @click="moveCursor('pass', cursor)"
-         />
-      </div>
-      <div v-if="explode">
-         <div v-confetti></div>
+         <div>
+            <span class="underline">
+               <i class="pi pi-star-fill text-yellow-400"></i> {{ score }}
+            </span>
+         </div>
+         <div class="w-10/12 flex justify-end">
+            <Button
+               severity="warn"
+               class="text-slate-100"
+               icon="pi pi-angle-double-right"
+               label="Pass"
+               @click="moveCursor('pass', cursor)"
+            />
+         </div>
+         <div v-if="explode">
+            <div v-confetti></div>
+         </div>
       </div>
    </div>
 </template>
@@ -81,12 +59,13 @@
 import mockData from '../utils/MockData'
 import { vConfetti } from '@neoconfetti/vue'
 let data = ref([])
-const gameOver = ref(false)
+
+const gameStatus = ref('notStarted')
 const explode = ref(false)
 const moveCursor = (navigation, currentIndex) => {
    if (data.value.every((item) => item.questionStatus === 'answered')) {
       console.log('All questions have been answered')
-      gameOver.value = true
+      gameStatus.value = 'over'
       data.value.filter((item) => item.questionStatus === 'answered').length >
          5 && (explode.value = true)
       return

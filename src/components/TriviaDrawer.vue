@@ -3,7 +3,7 @@
       <template #container="{ closeCallback }">
          <div class="flex flex-col h-full">
             <div class="flex items-center justify-between px-6 pt-4 shrink-0">
-               <span class="inline-flex items-center ">
+               <span class="inline-flex items-center">
                   <!-- INSERT LOGO -->
 
                   <div
@@ -99,7 +99,6 @@
 <script setup>
 const visible = defineModel('visible')
 const props = defineProps(['header'])
-console.log(props)
 </script>
 
 <style lang="scss" scoped></style>
