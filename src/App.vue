@@ -1,12 +1,10 @@
 <script setup>
-import { VueQueryDevtools } from '@tanstack/vue-query-devtools'
-import { ref } from 'vue'
-import TriviaTitle from './components/TriviaTitle.vue'
-const visible = ref(false)
+
+// const visible = ref(false)
 </script>
 
 <template>
-   <Menubar>
+   <!-- <Menubar>
       <template #start>
          <TriviaTitle />
       </template>
@@ -20,7 +18,7 @@ const visible = ref(false)
          />
       </template>
    </Menubar>
-   <TriviaDrawer v-model:visible="visible" />
+   <TriviaDrawer v-model:visible="visible" /> -->
    <RouterView />
    <VueQueryDevtools />
 </template>

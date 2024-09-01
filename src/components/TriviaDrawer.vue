@@ -49,7 +49,7 @@
                      <ul class="list-none p-0 m-0 overflow-hidden">
                         <li>
                            <RouterLink
-                              to="/trivia-quiz"
+                              to="/trivia"
                               class="flex items-center cursor-pointer p-4 rounded text-surface-700 hover:bg-surface-100 dark:text-surface-0 dark:hover:bg-surface-800 duration-150 transition-colors p-ripple"
                            >
                               <i class="pi pi-trophy mr-2"></i>
@@ -58,7 +58,7 @@
                         </li>
                         <li>
                            <RouterLink
-                              to="/movie-quiz"
+                              to="/movie"
                               class="flex items-center cursor-pointer p-4 rounded text-surface-700 hover:bg-surface-100 dark:text-surface-0 dark:hover:bg-surface-800 duration-150 transition-colors p-ripple"
                            >
                               <i class="pi pi-video mr-2"></i>
