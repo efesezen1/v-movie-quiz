@@ -8,6 +8,7 @@ import PrimeVue from 'primevue/config'
 import 'primeicons/primeicons.css'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import Aura from '@primevue/themes/aura'
+import ToastService from 'primevue/toastservice'
 import Home from './pages/Home.vue'
 import About from './pages/About.vue'
 const presetOptions = {
@@ -30,6 +31,7 @@ const app = createApp(App)
 
 app.use(PrimeVue, presetOptions)
    .component(VueCountdown.name, VueCountdown)
+   .use(ToastService)
    .provide('$http', $http)
    .use(VueQueryPlugin)
    .use(router)

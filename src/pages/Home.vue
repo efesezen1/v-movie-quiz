@@ -4,6 +4,7 @@
       style="background-image: url('/confetti.png'); background-size: cover"
       class="w-full h-[94vh] text-xl px-4 py-2 flex flex-col justify-center items-start"
    >
+      <Toast position="top-center" />
       <div class="mb-60">
          <h1 class="text-9xl font-bold">
             <TriviaTitle class="text-8xl" /> Quiz
@@ -111,7 +112,7 @@
          />
          <div class="w-full">
             <div class="flex justify-end items-center gap-2 w-11/12 my-2">
-               <i class="pi-clock pi"></i>
+               <i class="pi-stopwatch pi"></i>
                {{ `${minutes}:${seconds}` }}
             </div>
          </div>
@@ -231,12 +232,14 @@
 
 <script setup>
 import TriviaTitle from '../components/TriviaTitle.vue'
+import { useToast } from 'primevue/useToast'
+const toast = useToast()
 import mockData from '../utils/MockData'
 import { vConfetti } from '@neoconfetti/vue'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import axios from 'axios'
 const qNavVisible = ref(false)
-const gameTimeRange = ref(250000 * 1000)
+const gameTimeRange = ref(60 * 1000)
 const displaySettingDrawer = ref(false)
 const gameStatus = ref('notStarted')
 const data = ref([])
@@ -277,6 +280,7 @@ const fetchCategorizedData = async () => {
             throw new Error(err.message)
          }
       },
+      refetchOnWindowFocus: false,
    })
    return data
 }
@@ -285,6 +289,13 @@ const playCategorizedGame = async () => {
       selectedCategory.value === undefined &&
       selectedDifficulty.value === undefined
    ) {
+      toast.add({
+         severity: 'info',
+         summary: 'Hey!',
+         detail:
+            'If you do not want to select either difficulty or category, you can play a flash game.',
+         life: 3000,
+      })
       console.log('prohibited. please select a difficulty and category')
       return
    }
@@ -366,6 +377,7 @@ const {
       }
    },
    initialData: mockData,
+   refetchOnWindowFocus: false,
 })
 
 const { data: categoryOptions, isLoading: isCategoryLoading } = useQuery({

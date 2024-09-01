@@ -52,7 +52,7 @@
                               to="/trivia-quiz"
                               class="flex items-center cursor-pointer p-4 rounded text-surface-700 hover:bg-surface-100 dark:text-surface-0 dark:hover:bg-surface-800 duration-150 transition-colors p-ripple"
                            >
-                              <i class="pi pi-folder mr-2"></i>
+                              <i class="pi pi-trophy mr-2"></i>
                               <span class="font-medium">Trivia Quiz</span>
                            </RouterLink>
                         </li>
@@ -61,7 +61,7 @@
                               to="/movie-quiz"
                               class="flex items-center cursor-pointer p-4 rounded text-surface-700 hover:bg-surface-100 dark:text-surface-0 dark:hover:bg-surface-800 duration-150 transition-colors p-ripple"
                            >
-                              <i class="pi pi-chart-bar mr-2"></i>
+                              <i class="pi pi-video mr-2"></i>
                               <span class="font-medium">Movie Quiz</span>
                            </RouterLink>
                         </li>
