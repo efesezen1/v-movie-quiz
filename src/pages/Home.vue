@@ -1,11 +1,9 @@
 <template>
-   <Button>
-      <RouterLink to="/about">About</RouterLink>
-   </Button>
    <!-- <div class="right-0 absolute bg-slate-100 text-slate-900 rounded-l">
       <div class="text-xl px-4 py-2">Question {{ cursor }}</div>
    </div> -->
-   <div class="w-full bg-orange-400 text-xl px-4 py-2 flex flex-row">
+
+   <div class="w-full  text-xl px-4 py-2 flex flex-row">
       <div v-for="(item, index) in data" class="mx-auto">
          <div
             class="bg-white text-slate-900 rounded-full w-[30px] h-[30px] flex justify-center items-center transition-all duration-300 text-sm overflow-y-scroll"
@@ -23,7 +21,13 @@
             @click="moveCursor('to', index)"
             :disabled="gameOver"
          >
-            <small>{{ index + 1 }}</small>
+            <small>{{
+               item.questionStatus === 'unanswered'
+                  ? index + 1
+                  : item.questionStatus === 'answered' && !item.isAnsweredTrue
+                  ? '✘'
+                  : item.isAnsweredTrue && '✔'
+            }}</small>
          </div>
       </div>
    </div>
