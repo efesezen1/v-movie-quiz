@@ -6,14 +6,7 @@
                <span class="inline-flex items-center">
                   <!-- INSERT LOGO -->
 
-                  <div
-                     :class="`text-2xl font-bold font-mono ${item.color}
-            `"
-                     v-for="(item, index) in header"
-                     :key="index"
-                  >
-                     {{ item.letter }}
-                  </div>
+<TriviaTitle/>
                </span>
                <!-- <span>
                   <Button
@@ -97,8 +90,10 @@
 </template>
 
 <script setup>
+import TriviaTitle from './TriviaTitle.vue';
+
 const visible = defineModel('visible')
-const props = defineProps(['header'])
+
 </script>
 
 <style lang="scss" scoped></style>

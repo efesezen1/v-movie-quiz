@@ -21,7 +21,9 @@
    <SpeedDial
       :model="items"
       :radius="150"
-      :visible="true"
+      :visible="qNavVisible"
+      @show="qNavVisible = true"
+      @hide="qNavVisible = false"
       :hide-on-click-outside="false"
       type="semi-circle"
       show-icon="pi pi-question"
@@ -33,7 +35,7 @@
    >
       <template #item="{ item, toggleCallback }">
          <div
-            class="bg-slate-900 text-white rounded-full w-[40px] h-[40px] flex justify-center items-center transition-all duration-300 text-sm overflow-y-scroll"
+            class="dark:bg-slate-900 dark:text-white bg-slate-100 text-slate-900 rounded-full w-[40px] h-[40px] flex justify-center items-center transition-all duration-300 text-sm overflow-y-scroll"
             :class="questionsStyling(item, item.index)"
             :disabled="gameStatus"
             @click="toggleCallback"
@@ -45,7 +47,7 @@
                   ? item.index + 1
                   : item.questionStatus === 'answered' && !item.isAnsweredTrue
                   ? '✘'
-                  : item.isAnsweredTrue && '✔'
+                  : item.isAnsweredTrue && '✔︎'
             }}</small>
          </div>
       </template>
@@ -61,7 +63,7 @@ const props = defineProps({
 })
 
 const { data, cursor, gameStatus } = toRefs(props)
-
+const qNavVisible = defineModel('display')
 const emit = defineEmits(['question:clicked'])
 const questionsStyling = (item, index) => ({
    'border-4 border-green-500 text-white': item.isAnsweredTrue,

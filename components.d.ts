@@ -19,6 +19,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     SpeedDial: typeof import('primevue/speeddial')['default']
     TriviaDrawer: typeof import('./src/components/TriviaDrawer.vue')['default']
+    TriviaTitle: typeof import('./src/components/TriviaTitle.vue')['default']
   }
   export interface ComponentCustomProperties {
     Ripple: typeof import('primevue/ripple')['default']
