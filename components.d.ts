@@ -10,6 +10,7 @@ declare module 'vue' {
     Avatar: typeof import('primevue/avatar')['default']
     Button: typeof import('primevue/button')['default']
     Drawer: typeof import('primevue/drawer')['default']
+    FloatLabel: typeof import('primevue/floatlabel')['default']
     Home: typeof import('./src/components/Home.vue')['default']
     Menu: typeof import('primevue/menu')['default']
     Menubar: typeof import('primevue/menubar')['default']
@@ -19,7 +20,9 @@ declare module 'vue' {
     Quiz: typeof import('./src/components/Quiz.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Select: typeof import('primevue/select')['default']
     SpeedDial: typeof import('primevue/speeddial')['default']
+    Toast: typeof import('primevue/toast')['default']
     TriviaDrawer: typeof import('./src/components/TriviaDrawer.vue')['default']
     TriviaTitle: typeof import('./src/components/TriviaTitle.vue')['default']
   }

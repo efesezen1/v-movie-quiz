@@ -1,6 +1,5 @@
-
-
 # Vue Movie Quiz Project
+
 ==========================
 
 ## Overview
@@ -9,13 +8,13 @@ This project is a Vue.js application that provides a movie quiz game. The game i
 
 ## Features
 
-* Movie quiz game with multiple questions
-* User-friendly interface with PrimeVue components
-* State management and data fetching with Vue Query
-* Routing with Vue Router
-* Styling with Tailwind CSS
-* Auto-importing of Vue and VueUse elements with unplugin-auto-import
-* Auto-importing of components with unplugin-vue-components
+-  Movie quiz game with multiple questions
+-  User-friendly interface with PrimeVue components
+-  State management and data fetching with Vue Query
+-  Routing with Vue Router
+-  Styling with Tailwind CSS
+-  Auto-importing of Vue and VueUse elements with unplugin-auto-import
+-  Auto-importing of components with unplugin-vue-components
 
 ## Installation
 
@@ -29,19 +28,19 @@ To get started with the project, follow these steps:
 
 The project is organized into the following folders:
 
-* `src`: The source code folder, containing the Vue application code.
-* `public`: The public folder, containing static assets and the index.html file.
-* `utils`: The utilities folder, containing helper functions and configurations.
+-  `src`: The source code folder, containing the Vue application code.
+-  `public`: The public folder, containing static assets and the index.html file.
+-  `utils`: The utilities folder, containing helper functions and configurations.
 
 ## Components
 
 The project uses the following components:
 
-* `App.vue`: The main application component.
-* `Home.vue`: The home page component.
-* `About.vue`: The about page component.
-* `TriviaTitle.vue`: The trivia title component.
-* `TriviaDrawer.vue`: The trivia drawer component.
+-  `App.vue`: The main application component.
+-  `Home.vue`: The home page component.
+-  `About.vue`: The about page component.
+-  `TriviaTitle.vue`: The trivia title component.
+-  `TriviaDrawer.vue`: The trivia drawer component.
 
 ## Routing
 

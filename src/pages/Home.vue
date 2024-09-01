@@ -8,19 +8,87 @@
          <h1 class="text-9xl font-bold">
             <TriviaTitle class="text-8xl" /> Quiz
          </h1>
-
-         <Button
-            @click="() => (gameStatus = 'started')"
-            severity="warn"
-            class="mt-10 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
-            >Start game</Button
-         >
+         <div class="flex flex-row gap-4">
+            <Button
+               @click="
+                  () => {
+                     gameStatus = 'started'
+                     isCategorized = false
+                  }
+               "
+               severity="warn"
+               class="mt-10"
+               label="Flash Game"
+            />
+            <Button
+               class="mt-10"
+               label="Game Settings"
+               @click="displaySettingDrawer = true"
+            />
+         </div>
       </div>
+      <Drawer
+         v-model:visible="displaySettingDrawer"
+         header="Settings"
+         position="bottom"
+         style="height: 40vh"
+      >
+         <template #header>
+            <div class="flex items-center gap-2">
+               <Avatar shape="circle" class="pi pi-cog" />
+               <span class="font-bold">Settings</span>
+            </div>
+         </template>
+         <div class="mt-5 d-flex flex-row gap-10">
+            <FloatLabel class="w-full mb-10">
+               <Select
+                  v-model="selectedCategory"
+                  showClear
+                  :loading="isCategoryLoading"
+                  :options="categoryOptions"
+                  optionLabel="name"
+                  optionValue="id"
+                  class="w-full"
+                  id="category-select"
+               />
+               <label for="category-select">{{
+                  selectedCategory ? 'Category' : 'Set Category'
+               }}</label>
+            </FloatLabel>
+            <FloatLabel class="w-full mb-10">
+               <Select
+                  v-model="selectedDifficulty"
+                  showClear
+                  :options="difficultyOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  class="w-full"
+                  id="difficulty-select"
+               />
+               <label for="difficulty-select">{{
+                  selectedDifficulty ? 'Difficulty' : 'Set Difficulty'
+               }}</label>
+            </FloatLabel>
+         </div>
+
+         <template #footer>
+            <div class="flex items-center gap-2">
+               <Button
+                  :label="categorizedPlayLabel"
+                  :loading="categorizedPlayLoading"
+                  icon="pi pi-play"
+                  class="flex-auto"
+                  :outlined="settingPlayButtonOutline"
+                  @click="playCategorizedGame"
+               ></Button>
+            </div>
+         </template>
+      </Drawer>
    </div>
 
    <div v-else-if="gameStatus === 'started'">
       <vue-countdown
-         :auto-start="gameStatus === 'started'"
+         v-if="gameStatus === 'started' && !isLoading"
          :time="gameTimeRange"
          v-slot="{
             days,
@@ -36,7 +104,7 @@
          @end="gameStatus = 'over'"
       >
          <ProgressBar
-            :value="parseInt((totalMilliseconds / 61000) * 100)"
+            :value="parseInt(gameTimeRange * 100)"
             :showValue="false"
             class="w-full"
             style="border-radius: 0px; height: 0.1rem"
@@ -57,7 +125,7 @@
             :data="data"
             :cursor="cursor"
             @question:clicked="moveCursor"
-            :key="cursor"
+            :key="cursor + gameStatus"
             v-model:display="qNavVisible"
          />
          <div
@@ -108,22 +176,56 @@
    >
       <div class="w-11/12 ml-3 mb-40">
          <h1 class="text-9xl font-bold text-slate-100">Game Over.</h1>
-         <h1 class="ml-2 text-5xl font-bold text-slate-100">
+         <h1
+            class="ml-2 text-5xl font-bold text-slate-100 flex items-center gap-4"
+         >
             <i
+               v-if="data.filter((item) => item.isAnsweredTrue).length >= 5"
                class="pi pi-star-fill text-yellow-500"
-               style="font-size: 2rem"
+               style="font-size: 3rem"
             ></i>
+            <div v-else class="text-5xl">🥶</div>
             Score:
             {{ score }}
          </h1>
          <div class="mt-10 flex flex-row gap-4">
             <Button label="Play Again" @click="restart" />
-            <Button label="Show Answers" />
+            <Button label="Show Answers" @click="answerDrawer = true" />
          </div>
          <div v-if="explode">
             <div v-confetti></div>
          </div>
       </div>
+      <Drawer
+         v-model:visible="answerDrawer"
+         header="Answers"
+         position="bottom"
+         style="max-height: 100vh; min-height: 43vh; overflow-y: scroll"
+      >
+         <div
+            class="flex flex-col gap-4 w-full justify-center items-center my-4"
+         >
+            <div class="w-11/12" v-for="item in data">
+               <div>
+                  {{ item.isAnsweredTrue ? '✔' : '✘' }} - {{ item.question }}
+               </div>
+               <div>
+                  Correct answer:
+                  {{ item.options.find((option) => option.isAnswer).text }}
+               </div>
+               <div>
+                  {{
+                     item.options.find((option) => option.isSelected)
+                        ? ` Your answer: ${
+                             item.options.find((option) => option.isSelected)
+                                .text
+                          }`
+                        : ''
+                  }}
+               </div>
+            </div>
+         </div>
+      </Drawer>
    </div>
 </template>
 
@@ -131,19 +233,123 @@
 import TriviaTitle from '../components/TriviaTitle.vue'
 import mockData from '../utils/MockData'
 import { vConfetti } from '@neoconfetti/vue'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import axios from 'axios'
 const qNavVisible = ref(false)
 const gameTimeRange = ref(250000 * 1000)
-
+const displaySettingDrawer = ref(false)
 const gameStatus = ref('notStarted')
 const data = ref([])
+const selectedDifficulty = ref()
+const selectedCategory = ref()
+const settingPlayButtonOutline = ref(true)
+const isCategorized = ref(false)
+const queryClient = useQueryClient()
+const answerDrawer = ref(false)
+const categorizedUrl = computed(() => [
+   'https://the-trivia-api.com/api/questions?limit=10',
+   {
+      params: {
+         difficulty: selectedDifficulty.value,
+         category: selectedCategory.value,
+      },
+   },
+])
+const categorizedPlayLoading = ref(false)
+const categorizedPlayLabel = ref('Play Categorized Game')
+
+const fetchCategorizedData = async () => {
+   const data = await queryClient.fetchQuery({
+      queryKey: [
+         'categorizedQuestions',
+         selectedDifficulty.value,
+         selectedCategory.value,
+      ],
+      queryFn: async () => {
+         try {
+            const response = await axios.get(...categorizedUrl.value)
+            console.log(...categorizedUrl.value)
+            const data = response.data
+            const optimizedData = quizzify(data)
+            console.log(data)
+            return optimizedData
+         } catch (err) {
+            throw new Error(err.message)
+         }
+      },
+   })
+   return data
+}
+const playCategorizedGame = async () => {
+   if (
+      selectedCategory.value === undefined &&
+      selectedDifficulty.value === undefined
+   ) {
+      console.log('prohibited. please select a difficulty and category')
+      return
+   }
+   isCategorized.value = true
+   settingPlayButtonOutline.value = false
+   categorizedPlayLoading.value = true
+   categorizedPlayLabel.value = 'Loading...'
+   data.value = await fetchCategorizedData()
+   setTimeout(() => {
+      settingPlayButtonOutline.value = true
+      categorizedPlayLoading.value = false
+      categorizedPlayLabel.value = 'Play Categorized Game'
+      gameStatus.value = 'started'
+   }, 1000)
+}
+const optionTypeOptions = ref([
+   {
+      label: 'Multiple Choice',
+      value: 'multiple',
+   },
+   {
+      label: 'True/False',
+      value: 'boolean',
+   },
+])
+const difficultyOptions = ref([
+   {
+      label: 'Easy',
+      value: 'easy',
+   },
+   {
+      label: 'Medium',
+      value: 'medium',
+   },
+   {
+      label: 'Hard',
+      value: 'hard',
+   },
+])
+
+const quizzify = (data) => {
+   return data.map((item, index) => {
+      const options_ = shuffle([...item.incorrectAnswers, item.correctAnswer])
+      const options = options_.map((option, index) => {
+         return {
+            isAnswer: option === item.correctAnswer,
+            text: option,
+            isSelected: false,
+            isButtonDisabled: false,
+         }
+      })
+      return {
+         isAnsweredTrue: false,
+         question: item.question,
+         options,
+         questionStatus: 'unanswered',
+      }
+   })
+}
 const {
-   data: queryData,
+   data: queryBaseData,
    isLoading,
    isError,
    error,
-   refetch: refetchQuestions,
+   refetch: refetchBaseQuestions,
 } = useQuery({
    queryKey: ['questions'],
    queryFn: async () => {
@@ -152,35 +358,34 @@ const {
             'https://the-trivia-api.com/api/questions?limit=10'
          )
          const data = response.data
-         const optimizedData = data.map((item, index) => {
-            const options_ = shuffle([
-               ...item.incorrectAnswers,
-               item.correctAnswer,
-            ])
-            const options = options_.map((option, index) => {
-               return {
-                  isAnswer: option === item.correctAnswer,
-                  text: option,
-                  isSelected: false,
-                  isButtonDisabled: false,
-               }
-            })
-            return {
-               isAnsweredTrue: false,
-               question: item.question,
-               options,
-               questionStatus: 'unanswered',
-            }
-         })
-         data.value = optimizedData
+         const optimizedData = quizzify(data)
+
          return optimizedData
       } catch (error) {
          throw new Error(error.message)
       }
    },
+   initialData: mockData,
 })
-watch(queryData, () => {
-   data.value = toRaw(queryData.value ?? [])
+
+const { data: categoryOptions, isLoading: isCategoryLoading } = useQuery({
+   queryKey: ['categories'],
+   queryFn: async () => {
+      try {
+         const response = await axios.get(
+            'https://opentdb.com/api_category.php'
+         )
+         const data = response.data.trivia_categories
+         console.log('categories', data)
+         return data
+      } catch (error) {
+         throw new Error(error.message)
+      }
+   },
+})
+
+watch(queryBaseData, () => {
+   data.value = toRaw(queryBaseData.value ?? [])
 })
 
 watch(
@@ -207,8 +412,8 @@ const moveCursor = (navigation, currentIndex) => {
    if (data.value.every((item) => item.questionStatus === 'answered')) {
       console.log('All questions have been answered')
       gameStatus.value = 'over'
-      data.value.filter((item) => item.questionStatus === 'answered').length >
-         5 && (explode.value = true)
+      data.value.filter((item) => item.isAnsweredTrue).length > 5 &&
+         (explode.value = true)
       return
    }
    if (navigation === 'next') {
@@ -250,7 +455,11 @@ const currentOptions = computed(() => {
 
 const restart = () => {
    console.log('Restarting...')
-   refetchQuestions()
+   if (isCategorized.value) {
+      playCategorizedGame()
+   } else {
+      refetchBaseQuestions()
+   }
    cursor.value = 0
    qNavVisible.value = false
    gameStatus.value = 'started'
