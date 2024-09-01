@@ -9,6 +9,7 @@
       "preview": "vite preview"
    },
    "dependencies": {
+      "@chenfengyuan/vue-countdown": "^2.1.2",
       "@neoconfetti/vue": "^2.2.1",
       "@primevue/themes": "^4.0.5",
       "@tanstack/vue-query": "^5.53.1",
@@ -17,7 +18,7 @@
       "axios": "^1.7.5",
       "primeicons": "^7.0.0",
       "primevue": "^4.0.5",
-      "vue": "^3.4.37",
+      "vue": "^3.4.38",
       "vue-router": "^4.4.3"
    },
    "devDependencies": {

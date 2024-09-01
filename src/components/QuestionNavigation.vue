@@ -18,12 +18,12 @@
       </div>
    </div> -->
 
+   <!-- @hide="qNavVisible = false" -->
    <SpeedDial
       :model="items"
       :radius="150"
-      :visible="qNavVisible"
+      :visible="qNavVisible ? true : false"
       @show="qNavVisible = true"
-      @hide="qNavVisible = false"
       :hide-on-click-outside="false"
       type="semi-circle"
       show-icon="pi pi-question"

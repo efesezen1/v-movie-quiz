@@ -1,6 +1,6 @@
 import { createApp, provide } from 'vue'
 import './style.css'
-import $http from './utils/AxiosSetup'
+import VueCountdown from '@chenfengyuan/vue-countdown'
 import App from './App.vue'
 import $http from '@/utils/AxiosSetup'
 import { createMemoryHistory, createRouter } from 'vue-router'
@@ -29,6 +29,7 @@ const router = createRouter({
 const app = createApp(App)
 
 app.use(PrimeVue, presetOptions)
+   .component(VueCountdown.name, VueCountdown)
    .provide('$http', $http)
    .use(VueQueryPlugin)
    .use(router)

@@ -4,7 +4,7 @@
       style="background-image: url('/confetti.png'); background-size: cover"
       class="w-full h-[94vh] text-xl px-4 py-2 flex flex-col justify-center items-start"
    >
-      <div class="mb-56">
+      <div class="mb-60">
          <h1 class="text-9xl font-bold">
             <TriviaTitle class="text-8xl" /> Quiz
          </h1>
@@ -19,6 +19,36 @@
    </div>
 
    <div v-else-if="gameStatus === 'started'">
+      <vue-countdown
+         :auto-start="gameStatus === 'started'"
+         :time="gameTimeRange"
+         v-slot="{
+            days,
+            hours,
+            minutes,
+            seconds,
+            totalSeconds,
+            totalMilliseconds,
+         }"
+         @progress="
+            (data) => (data.totalSeconds === 0 ? (gameStatus = 'over') : null)
+         "
+         @end="gameStatus = 'over'"
+      >
+         <ProgressBar
+            :value="parseInt((totalMilliseconds / 61000) * 100)"
+            :showValue="false"
+            class="w-full"
+            style="border-radius: 0px; height: 0.1rem"
+         />
+         <div class="w-full">
+            <div class="flex justify-end items-center gap-2 w-11/12 my-2">
+               <i class="pi-clock pi"></i>
+               {{ `${minutes}:${seconds}` }}
+            </div>
+         </div>
+      </vue-countdown>
+
       <div v-if="isLoading" class="flex justify-center items-center h-[94vh]">
          <ProgressSpinner class=" "></ProgressSpinner>
       </div>
@@ -98,21 +128,22 @@
 </template>
 
 <script setup>
-import { ref, toRaw } from 'vue'
 import TriviaTitle from '../components/TriviaTitle.vue'
 import mockData from '../utils/MockData'
 import { vConfetti } from '@neoconfetti/vue'
 import { useQuery } from '@tanstack/vue-query'
 import axios from 'axios'
 const qNavVisible = ref(false)
+const gameTimeRange = ref(250000 * 1000)
 
-const gameStatus = ref('started')
+const gameStatus = ref('notStarted')
 const data = ref([])
 const {
    data: queryData,
    isLoading,
    isError,
    error,
+   refetch: refetchQuestions,
 } = useQuery({
    queryKey: ['questions'],
    queryFn: async () => {
@@ -121,7 +152,6 @@ const {
             'https://the-trivia-api.com/api/questions?limit=10'
          )
          const data = response.data
-         console.log(data)
          const optimizedData = data.map((item, index) => {
             const options_ = shuffle([
                ...item.incorrectAnswers,
@@ -218,29 +248,9 @@ const currentOptions = computed(() => {
    return data.value[cursor.value].options
 })
 
-// const initData = () =>
-// mockData.map((item) => {
-//    const options_ = shuffle([...item.incorrectAnswers, item.correctAnswer])
-//    const options = options_.map((option, index) => {
-//       return {
-//          isAnswer: option === item.correctAnswer,
-//          text: option,
-//          isSelected: false,
-//          isButtonDisabled: false,
-//       }
-//    })
-//    return {
-//       isAnsweredTrue: false,
-//       question: item.question,
-//       options,
-//       questionStatus: 'unanswered',
-//    }
-// })
-// data.value = initData()
-
 const restart = () => {
    console.log('Restarting...')
-   data.value = initData()
+   refetchQuestions()
    cursor.value = 0
    qNavVisible.value = false
    gameStatus.value = 'started'
@@ -280,4 +290,19 @@ const answer = (currentQuestion_, selected) => {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style>
+.p-progressbar {
+   position: relative;
+   overflow: hidden;
+   height: var(--p-progressbar-height);
+   background: none !important;
+   border-radius: none;
+}
+.p-progressbar-value {
+   color: red;
+   background-color: yellow;
+}
+.p-progressbar-determinate {
+   border-radius: none !important;
+}
+</style>

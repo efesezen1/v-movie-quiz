@@ -13,6 +13,7 @@ declare module 'vue' {
     Home: typeof import('./src/components/Home.vue')['default']
     Menu: typeof import('primevue/menu')['default']
     Menubar: typeof import('primevue/menubar')['default']
+    ProgressBar: typeof import('primevue/progressbar')['default']
     ProgressSpinner: typeof import('primevue/progressspinner')['default']
     QuestionNavigation: typeof import('./src/components/QuestionNavigation.vue')['default']
     Quiz: typeof import('./src/components/Quiz.vue')['default']
