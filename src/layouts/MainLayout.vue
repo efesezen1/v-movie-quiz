@@ -3,7 +3,9 @@
       <Toast />
       <Menubar>
          <template #start>
-            <TriviaTitle />
+            <RouterLink to="/">
+               <TriviaTitle />
+            </RouterLink>
          </template>
          <template #end>
             <Button

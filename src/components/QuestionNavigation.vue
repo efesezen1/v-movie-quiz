@@ -38,7 +38,11 @@
             class="dark:bg-slate-900 dark:text-white bg-slate-100 text-slate-900 rounded-full w-[40px] h-[40px] flex justify-center items-center transition-all duration-300 text-sm overflow-y-scroll"
             :class="questionsStyling(item, item.index)"
             :disabled="gameStatus"
-            @click="toggleCallback"
+            @click="
+               (e) =>
+                  (gameStatus === 'started' || item.index !== cursor) &&
+                  toggleCallback(e)
+            "
          >
             <!-- @click="console.log(item)" -->
             <!-- @click="emit('question:clicked', 'to', index)" -->
