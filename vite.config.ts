@@ -6,6 +6,7 @@ import Components from 'unplugin-vue-components/vite'
 import { PrimeVueResolver } from '@primevue/auto-import-resolver'
 export default defineConfig({
    // set src directory alias
+   
    resolve: {
       alias: {
          '@': '/src',

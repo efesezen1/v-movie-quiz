@@ -1,7 +1,7 @@
 <template>
    <div>
       <Toast />
-      <Menubar>
+      <Menubar class="!border-none">
          <template #start>
             <RouterLink to="/">
                <TriviaTitle />

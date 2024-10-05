@@ -237,7 +237,7 @@ import mockData from '../utils/MockData'
 import { vConfetti } from '@neoconfetti/vue'
 import axios from 'axios'
 const qNavVisible = ref(false)
-const gameTimeRange = ref(60 * 1000)
+const gameTimeRange = ref(600 * 1000)
 const displaySettingDrawer = ref(false)
 const gameStatus = ref('notStarted')
 const data = ref([])

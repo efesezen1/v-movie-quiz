@@ -6,7 +6,7 @@
                <span class="inline-flex items-center">
                   <!-- INSERT LOGO -->
 
-<TriviaTitle/>
+                  <TriviaTitle />
                </span>
                <!-- <span>
                   <Button
@@ -62,14 +62,14 @@
                               class="flex items-center cursor-pointer p-4 rounded text-surface-700 hover:bg-surface-100 dark:text-surface-0 dark:hover:bg-surface-800 duration-150 transition-colors p-ripple"
                            >
                               <i class="pi pi-video mr-2"></i>
-                              <span class="font-medium">Movie Quiz</span>
+                              <span class="font-medium">Guess The Movie</span>
                            </RouterLink>
                         </li>
                      </ul>
                   </li>
                </ul>
             </div>
-            <div class="mt-auto">
+            <!-- <div class="mt-auto">
                <hr
                   class="mb-4 mx-4 border-t border-0 border-surface-200 dark:border-surface-700"
                />
@@ -83,17 +83,16 @@
                   />
                   <span class="font-bold">Amy Elsner</span>
                </a>
-            </div>
+            </div> -->
          </div>
       </template>
    </Drawer>
 </template>
 
 <script setup>
-import TriviaTitle from './TriviaTitle.vue';
+import TriviaTitle from './TriviaTitle.vue'
 
 const visible = defineModel('visible')
-
 </script>
 
 <style lang="scss" scoped></style>

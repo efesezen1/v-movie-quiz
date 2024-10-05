@@ -7,11 +7,14 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AutoComplete: typeof import('primevue/autocomplete')['default']
     Avatar: typeof import('primevue/avatar')['default']
     Button: typeof import('primevue/button')['default']
     Drawer: typeof import('primevue/drawer')['default']
     FloatLabel: typeof import('primevue/floatlabel')['default']
     Home: typeof import('./src/components/Home.vue')['default']
+    InputGroup: typeof import('primevue/inputgroup')['default']
+    InputText: typeof import('primevue/inputtext')['default']
     Menu: typeof import('primevue/menu')['default']
     Menubar: typeof import('primevue/menubar')['default']
     ProgressBar: typeof import('primevue/progressbar')['default']
@@ -23,6 +26,7 @@ declare module 'vue' {
     Select: typeof import('primevue/select')['default']
     SpeedDial: typeof import('primevue/speeddial')['default']
     Toast: typeof import('primevue/toast')['default']
+    ToggleButton: typeof import('primevue/togglebutton')['default']
     TriviaDrawer: typeof import('./src/components/TriviaDrawer.vue')['default']
     TriviaTitle: typeof import('./src/components/TriviaTitle.vue')['default']
   }
