@@ -210,6 +210,7 @@
 </template>
 
 <script setup>
+import canonizeText from '@/utils/CanonicalizeText'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { _ } from 'lodash'
 import axios from 'axios'
@@ -318,9 +319,12 @@ watch(data, (val) => console.log(val))
 
 const checkAnswer = (answer_) => {
    console.log(answer_)
+   console.log('answer_', canonizeText(answer_))
+   console.log('movie_title', canonizeText(currentMovie.value.movie_title))
    const { movie_title: title } = currentMovie.value
    console.log(answer.value, title)
-   if (answer_ === title) {
+   const isAnswerTrue = canonizeText(answer_) === canonizeText(title)
+   if (isAnswerTrue) {
       answer.value = ''
       answerStatus.value = 'correct'
       answers.value = [
@@ -343,7 +347,7 @@ const checkAnswer = (answer_) => {
          return
       }, 300)
    }
-   if (answer_ !== title) {
+   if (!isAnswerTrue) {
       answers.value = [
          ...answers.value,
          {
