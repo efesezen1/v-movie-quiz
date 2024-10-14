@@ -29,12 +29,13 @@
                      </div>
                      <ul class="list-none p-0 m-0 overflow-hidden">
                         <li>
-                           <a
+                           <RouterLink
+                              to="/"
                               class="flex items-center cursor-pointer p-4 rounded text-surface-700 hover:bg-surface-100 dark:text-surface-0 dark:hover:bg-surface-800 duration-150 transition-colors p-ripple"
                            >
                               <i class="pi pi-home mr-2"></i>
                               <span class="font-medium">Home</span>
-                           </a>
+                           </RouterLink>
                         </li>
                      </ul>
                   </li>

@@ -270,6 +270,7 @@ const searchMovie = _.debounce(async () => {
 
 const router = useRoute()
 console.log(router)
+const movieData = ref([])
 const { data, refetch } = useQuery({
    queryKey: ['movie'],
    queryFn: async () => {
@@ -290,14 +291,16 @@ const { data, refetch } = useQuery({
          video.value = item.download
          return item
       })
+
+      movieData.value.push(...data)
       return data
    },
    initialData: [],
    refetchOnWindowFocus: false,
 })
 const currentMovie = computed(() => {
-   if (data.value.length === 0) return []
-   return data.value[questionCursor.value]
+   if (movieData.value.length === 0) return []
+   return movieData.value[questionCursor.value]
 })
 
 const setMemo = (questionCursor_, currentMovie_, answerStatus_, answers_) => {
@@ -389,12 +392,18 @@ const changeQuestion = (direction) => {
    setInitialState()
    console.log('questionCursor', questionCursor.value)
    if (direction === 'next') {
-      if (questionCursor.value >= data.value.length - 1) return
-      if (data.value.length - 1 - questionCursor.value === 2) {
+      if (questionCursor.value >= movieData.value.length - 2) {
+         console.log('no other movies')
+         refetch()
+         console.log('refetching bc there is no more movie')
+         return
+      }
+      console.log('there are other movies, remaining movie:', movieData.value.length)
+      questionCursor.value++
+      if (movieData.value.length - 1 - questionCursor.value === 2) {
          console.log('refetching...')
          refetch()
       }
-      questionCursor.value++
    }
    if (direction === 'previous') {
       if (questionCursor.value <= 0) return
