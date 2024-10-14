@@ -88,7 +88,7 @@ const items = ref([
       index,
       label: item.question,
       command: () => {
-         console.log('clicked')
+         // console.log('clicked')
          currentItemIndex.value = index
          emit('question:clicked', 'to', index)
       },

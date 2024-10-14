@@ -19,6 +19,7 @@ import InputGroup from 'primevue/inputgroup'
 import AutoComplete from 'primevue/autocomplete'
 import ProgressSpinner from 'primevue/progressspinner'
 import ToggleButton from 'primevue/togglebutton'
+import ProgressBar from 'primevue/progressbar'
 // import Home from './pages/Home.vue'
 // import About from './pages/About.vue'
 import router from './router'
@@ -54,6 +55,7 @@ app.use(PrimeVue, presetOptions)
    .component('AutoComplete', AutoComplete)
    .component('ProgressSpinner', ProgressSpinner)
    .component('ToggleButton', ToggleButton)
+   .component('ProgressBar', ProgressBar)
    .use(ToastService)
    .use(VueQueryPlugin)
    .use(router)

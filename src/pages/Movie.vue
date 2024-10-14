@@ -1,7 +1,7 @@
 <template>
    <div
       v-if="gameStatus === 'notStarted'"
-      style="background-image: url('/confetti.png'); background-size: cover"
+      style="background-image: url('./confetti.png'); background-size: cover"
       class="w-full h-[94vh] text-xl px-4 py-2 flex flex-col justify-center items-start"
    >
       <Toast position="top-center" />
@@ -286,7 +286,7 @@ const searchMovie = _.debounce(async () => {
       if (answer.value === '') return
       suggestions.value = []
       suggestionLoading.value = 'fetching'
-      console.log(answer.value)
+      // console.log(answer.value)
       const res = await queryClient.ensureQueryData({
          queryKey: ['movie', answer.value],
          queryFn: async () =>
@@ -298,7 +298,7 @@ const searchMovie = _.debounce(async () => {
          label: item._source.movie_title,
       }))
       const uniqSuggestions = _.uniqBy(allSuggestions, 'label')
-      console.log('Suggestions:', uniqSuggestions)
+      // console.log('Suggestions:', uniqSuggestions)
       suggestions.value = uniqSuggestions
    } catch (error) {
       suggestionLoading.value = 'error'
@@ -307,7 +307,7 @@ const searchMovie = _.debounce(async () => {
 }, 1000)
 
 const router = useRoute()
-console.log(router)
+// console.log(router)
 const movieData = ref([])
 const { data, refetch } = useQuery({
    queryKey: ['movie'],
@@ -318,12 +318,12 @@ const { data, refetch } = useQuery({
       const response = await axios.get(url + `&movie_imdbscore=${randomScore}`)
       const movies = response.data.hits.hits.map((x) => x._source)
 
-      console.log(movies)
+      // console.log(movies)
       const uniqMovie = _.uniqBy(movies, 'movie_title')
-      console.log('uniqMovie', uniqMovie)
+      // console.log('uniqMovie', uniqMovie)
       movieSession.value = [...movieSession.value, ...uniqMovie]
       movieSession.value = _.uniqBy(movieSession.value, 'movie_title')
-      console.log('movieSession', movieSession.value)
+      // console.log('movieSession', movieSession.value)
       const data = movieSession.value.map((item) => {
          // console.log(item._source)
          video.value = item.download
@@ -355,8 +355,8 @@ const setMemo = (questionCursor_, currentMovie_, answerStatus_, answers_) => {
    console.log('MEMO', memo.value)
 }
 
-watch(currentMovie, (val) => console.log('currentMovie', val))
-watch(data, (val) => console.log(val))
+// watch(currentMovie, (val) => console.log('currentMovie', val))
+// watch(data, (val) => console.log(val))
 
 const checkAnswer = (answer_) => {
    console.log(answer_)
