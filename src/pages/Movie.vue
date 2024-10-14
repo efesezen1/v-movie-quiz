@@ -20,12 +20,12 @@
             </div>
             <video
                v-if="currentMovie.download"
-               autoplay
                loop
+               autoplay
+               controls
                :src="currentMovie.download"
                :key="currentMovie.clipID"
                type="video/mp4"
-               muted
             >
                Your browser does not support the video tag.
             </video>
