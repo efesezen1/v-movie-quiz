@@ -59,6 +59,7 @@
 </template>
 
 <script setup>
+import { ref, computed, watch, onMounted, toRefs } from 'vue'
 const currentItemIndex = ref(0)
 const props = defineProps({
    data: Array,
@@ -87,7 +88,7 @@ const items = ref([
       index,
       label: item.question,
       command: () => {
-         console.log('clicked')
+         // console.log('clicked')
          currentItemIndex.value = index
          emit('question:clicked', 'to', index)
       },

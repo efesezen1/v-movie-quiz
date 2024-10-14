@@ -12,13 +12,14 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 const header = ref([
-   { letter: 'T', color: 'text-red-500 ' }, // Red
-   { letter: 'R', color: 'text-orange-500 ' }, // Orange
+   { letter: 'Q', color: 'text-red-500 ' }, // Red
+   { letter: 'U', color: 'text-orange-500 ' }, // Orange
    { letter: 'I', color: 'text-yellow-500  ' }, // Yellow
-   { letter: 'V', color: 'text-green-500 ' }, // Green
-   { letter: 'I', color: 'text-blue-500 ' }, // Blue
-   { letter: 'A', color: 'text-indigo-500 ' }, // Indigo
+   { letter: 'Z', color: 'text-green-500 ' }, // Green
+   { letter: 'Z', color: 'text-blue-500 ' }, // Blue
+   { letter: 'Y', color: 'text-indigo-500 ' }, // Indigo
 ])
 
 const props = defineProps({

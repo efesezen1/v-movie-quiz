@@ -27,6 +27,9 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import TriviaDrawer from '@/components/TriviaDrawer.vue'
+import TriviaTitle from '@/components/TriviaTitle.vue'
 const visible = ref(false)
 </script>
 

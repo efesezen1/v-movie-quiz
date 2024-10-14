@@ -1,13 +1,21 @@
 <template>
    <div
       v-if="gameStatus === 'notStarted'"
-      style="background-image: url('/confetti.png'); background-size: cover"
+      style="background-image: url('./confetti.png'); background-size: cover"
       class="w-full h-[94vh] text-xl px-4 py-2 flex flex-col justify-center items-start"
    >
       <Toast position="top-center" />
       <div class="mb-60">
          <h1 class="text-9xl font-bold">
-            <TriviaTitle class="text-8xl" /> Quiz
+            <span class="text-8xl flex flex-row">
+               <span class="text-red-500"> T </span>
+               <span class="text-orange-500"> R </span>
+               <span class="text-yellow-500"> I </span>
+               <span class="text-green-500"> V </span>
+               <span class="text-blue-500"> I </span>
+               <span class="text-indigo-500"> A </span>
+            </span>
+            Quiz
          </h1>
          <div class="flex flex-row gap-4">
             <Button
@@ -231,10 +239,15 @@
 </template>
 
 <script setup>
+import { ref, computed, watch, onMounted, toRaw } from 'vue'
+import QuestionNavigation from '@/components/QuestionNavigation.vue'
+import TriviaTitle from '@/components/TriviaTitle.vue'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useToast } from 'primevue/usetoast'
-const toast = useToast()
 import mockData from '../utils/MockData'
 import { vConfetti } from '@neoconfetti/vue'
+
+const toast = useToast()
 import axios from 'axios'
 const qNavVisible = ref(false)
 const minutes = (x) => x * 60 * 1000
@@ -403,7 +416,7 @@ watch(
    [gameStatus, isLoading],
    ([value, isLoadingVal], [oldValue, isLoadingOldVal]) => {
       if (oldValue !== 'started' && value === 'started' && !isLoadingVal) {
-         console.log('isLoadingVal', isLoadingVal)
+         // console.log('isLoadingVal', isLoadingVal)
          setTimeout(() => {
             qNavVisible.value = true
          }, 1000)

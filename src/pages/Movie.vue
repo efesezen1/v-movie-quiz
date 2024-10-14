@@ -1,7 +1,7 @@
 <template>
    <div
       v-if="gameStatus === 'notStarted'"
-      style="background-image: url('/confetti.png'); background-size: cover"
+      style="background-image: url('./confetti.png'); background-size: cover"
       class="w-full h-[94vh] text-xl px-4 py-2 flex flex-col justify-center items-start"
    >
       <Toast position="top-center" />
@@ -29,67 +29,10 @@
             />
          </div>
       </div>
-      <Drawer
-         v-model:visible="displaySettingDrawer"
-         header="Settings"
-         position="bottom"
-         style="height: 40vh"
-      >
-         <template #header>
-            <div class="flex items-center gap-2">
-               <Avatar shape="circle" class="pi pi-cog" />
-               <span class="font-bold">Settings</span>
-            </div>
-         </template>
-         <div class="mt-5 d-flex flex-row gap-10">
-            <FloatLabel class="w-full mb-10">
-               <Select
-                  v-model="selectedCategory"
-                  showClear
-                  :loading="isCategoryLoading"
-                  :options="categoryOptions"
-                  optionLabel="name"
-                  optionValue="id"
-                  class="w-full"
-                  id="category-select"
-               />
-               <label for="category-select">{{
-                  selectedCategory ? 'Category' : 'Set Category'
-               }}</label>
-            </FloatLabel>
-            <FloatLabel class="w-full mb-10">
-               <Select
-                  v-model="selectedDifficulty"
-                  showClear
-                  :options="difficultyOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  class="w-full"
-                  id="difficulty-select"
-               />
-               <label for="difficulty-select">{{
-                  selectedDifficulty ? 'Difficulty' : 'Set Difficulty'
-               }}</label>
-            </FloatLabel>
-         </div>
-
-         <template #footer>
-            <div class="flex items-center gap-2">
-               <Button
-                  :label="categorizedPlayLabel"
-                  :loading="categorizedPlayLoading"
-                  icon="pi pi-play"
-                  class="flex-auto"
-                  :outlined="settingPlayButtonOutline"
-                  @click="playCategorizedGame"
-               ></Button>
-            </div>
-         </template>
-      </Drawer>
    </div>
    <div
       class="flex flex-col min-h-[94vh] items-center mx-auto justify-between"
-      v-if="gameStatus === 'started'"
+      v-else-if="gameStatus === 'started'"
    >
       <div class="w-full">
          <div class="pt-[10%] flex flex-col items-center">
@@ -301,11 +244,11 @@
 </template>
 
 <script setup>
+import { ref, computed, watch, onMounted } from 'vue'
 import canonizeText from '@/utils/CanonicalizeText'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { _ } from 'lodash'
 import axios from 'axios'
-import { onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 const gameStatus = ref('notStarted')
 const displayDirector = ref(true)
@@ -343,7 +286,7 @@ const searchMovie = _.debounce(async () => {
       if (answer.value === '') return
       suggestions.value = []
       suggestionLoading.value = 'fetching'
-      console.log(answer.value)
+      // console.log(answer.value)
       const res = await queryClient.ensureQueryData({
          queryKey: ['movie', answer.value],
          queryFn: async () =>
@@ -355,7 +298,7 @@ const searchMovie = _.debounce(async () => {
          label: item._source.movie_title,
       }))
       const uniqSuggestions = _.uniqBy(allSuggestions, 'label')
-      console.log('Suggestions:', uniqSuggestions)
+      // console.log('Suggestions:', uniqSuggestions)
       suggestions.value = uniqSuggestions
    } catch (error) {
       suggestionLoading.value = 'error'
@@ -364,7 +307,7 @@ const searchMovie = _.debounce(async () => {
 }, 1000)
 
 const router = useRoute()
-console.log(router)
+// console.log(router)
 const movieData = ref([])
 const { data, refetch } = useQuery({
    queryKey: ['movie'],
@@ -375,12 +318,12 @@ const { data, refetch } = useQuery({
       const response = await axios.get(url + `&movie_imdbscore=${randomScore}`)
       const movies = response.data.hits.hits.map((x) => x._source)
 
-      console.log(movies)
+      // console.log(movies)
       const uniqMovie = _.uniqBy(movies, 'movie_title')
-      console.log('uniqMovie', uniqMovie)
+      // console.log('uniqMovie', uniqMovie)
       movieSession.value = [...movieSession.value, ...uniqMovie]
       movieSession.value = _.uniqBy(movieSession.value, 'movie_title')
-      console.log('movieSession', movieSession.value)
+      // console.log('movieSession', movieSession.value)
       const data = movieSession.value.map((item) => {
          // console.log(item._source)
          video.value = item.download
@@ -412,8 +355,8 @@ const setMemo = (questionCursor_, currentMovie_, answerStatus_, answers_) => {
    console.log('MEMO', memo.value)
 }
 
-watch(currentMovie, (val) => console.log('currentMovie', val))
-watch(data, (val) => console.log(val))
+// watch(currentMovie, (val) => console.log('currentMovie', val))
+// watch(data, (val) => console.log(val))
 
 const checkAnswer = (answer_) => {
    console.log(answer_)
