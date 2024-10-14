@@ -1,5 +1,96 @@
 <template>
-   <div class="flex flex-col min-h-[94vh] items-center mx-auto justify-between">
+   <div
+      v-if="gameStatus === 'notStarted'"
+      style="background-image: url('/confetti.png'); background-size: cover"
+      class="w-full h-[94vh] text-xl px-4 py-2 flex flex-col justify-center items-start"
+   >
+      <Toast position="top-center" />
+      <div class="mb-60">
+         <h1 class="text-9xl font-bold">
+            <span class="text-8xl flex flex-row">
+               <span class="text-red-500"> M </span>
+               <span class="text-orange-500"> O </span>
+               <span class="text-yellow-500"> V </span>
+               <span class="text-green-500"> I </span>
+               <span class="text-blue-500"> E </span>
+            </span>
+            Quiz
+         </h1>
+         <div class="flex flex-row gap-4">
+            <Button
+               @click="
+                  () => {
+                     gameStatus = 'started'
+                  }
+               "
+               severity="warn"
+               class="mt-10"
+               label="Start Game"
+            />
+         </div>
+      </div>
+      <Drawer
+         v-model:visible="displaySettingDrawer"
+         header="Settings"
+         position="bottom"
+         style="height: 40vh"
+      >
+         <template #header>
+            <div class="flex items-center gap-2">
+               <Avatar shape="circle" class="pi pi-cog" />
+               <span class="font-bold">Settings</span>
+            </div>
+         </template>
+         <div class="mt-5 d-flex flex-row gap-10">
+            <FloatLabel class="w-full mb-10">
+               <Select
+                  v-model="selectedCategory"
+                  showClear
+                  :loading="isCategoryLoading"
+                  :options="categoryOptions"
+                  optionLabel="name"
+                  optionValue="id"
+                  class="w-full"
+                  id="category-select"
+               />
+               <label for="category-select">{{
+                  selectedCategory ? 'Category' : 'Set Category'
+               }}</label>
+            </FloatLabel>
+            <FloatLabel class="w-full mb-10">
+               <Select
+                  v-model="selectedDifficulty"
+                  showClear
+                  :options="difficultyOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  class="w-full"
+                  id="difficulty-select"
+               />
+               <label for="difficulty-select">{{
+                  selectedDifficulty ? 'Difficulty' : 'Set Difficulty'
+               }}</label>
+            </FloatLabel>
+         </div>
+
+         <template #footer>
+            <div class="flex items-center gap-2">
+               <Button
+                  :label="categorizedPlayLabel"
+                  :loading="categorizedPlayLoading"
+                  icon="pi pi-play"
+                  class="flex-auto"
+                  :outlined="settingPlayButtonOutline"
+                  @click="playCategorizedGame"
+               ></Button>
+            </div>
+         </template>
+      </Drawer>
+   </div>
+   <div
+      class="flex flex-col min-h-[94vh] items-center mx-auto justify-between"
+      v-if="gameStatus === 'started'"
+   >
       <div class="w-full">
          <div class="pt-[10%] flex flex-col items-center">
             <div class="w-[90%] flex justify-between mb-2">
@@ -214,8 +305,9 @@ import canonizeText from '@/utils/CanonicalizeText'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { _ } from 'lodash'
 import axios from 'axios'
-import { watch } from 'vue'
+import { onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
+const gameStatus = ref('notStarted')
 const displayDirector = ref(true)
 const displayYear = ref(true)
 const displayMovieChars = ref(true)
@@ -236,6 +328,9 @@ const showAnswer = ref(false)
 const movieSession = ref([])
 const url = `https://api.clip.cafe/?api_key=${import.meta.env.VITE_APP_API_KEY}`
 
+onMounted(() => {
+   gameStatus.value = 'notStarted'
+})
 const replyNum = ref(4)
 
 const submitLabel = computed(() => {
@@ -398,7 +493,10 @@ const changeQuestion = (direction) => {
          console.log('refetching bc there is no more movie')
          return
       }
-      console.log('there are other movies, remaining movie:', movieData.value.length)
+      console.log(
+         'there are other movies, remaining movie:',
+         movieData.value.length
+      )
       questionCursor.value++
       if (movieData.value.length - 1 - questionCursor.value === 2) {
          console.log('refetching...')

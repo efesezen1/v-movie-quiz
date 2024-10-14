@@ -119,7 +119,7 @@
       </vue-countdown>
 
       <div v-if="isLoading" class="flex justify-center items-center h-[94vh]">
-         <ProgressSpinner class=" "></ProgressSpinner>
+         <ProgressSpinner />
       </div>
       <div v-else>
          <QuestionNavigation
@@ -130,7 +130,7 @@
             v-model:display="qNavVisible"
          />
          <div
-            class="flex flex-col items-center relative h-[70vh] justify-center"
+            class="flex flex-col items-center relative h-[55vh] justify-center"
          >
             <div v-html="currentQuestion" class="w-10/12"></div>
 
@@ -237,7 +237,8 @@ import mockData from '../utils/MockData'
 import { vConfetti } from '@neoconfetti/vue'
 import axios from 'axios'
 const qNavVisible = ref(false)
-const gameTimeRange = ref(600 * 1000)
+const minutes = (x) => x * 60 * 1000
+const gameTimeRange = ref(minutes(3))
 const displaySettingDrawer = ref(false)
 const gameStatus = ref('notStarted')
 const data = ref([])
@@ -256,6 +257,7 @@ const categorizedUrl = computed(() => [
       },
    },
 ])
+
 const categorizedPlayLoading = ref(false)
 const categorizedPlayLabel = ref('Play Categorized Game')
 
