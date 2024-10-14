@@ -6,8 +6,9 @@ const router = createRouter({
       {
          path: '/',
          component: () => import('@/layouts/MainLayout.vue'),
-         redirect: { path: '/movie' },
+         redirect: { path: '/home' },
          children: [
+            { path: '/home', component: () => import('@/pages/Home.vue') },
             { path: '/trivia', component: () => import('@/pages/Trivia.vue') },
             { path: '/movie', component: () => import('@/pages/Movie.vue') },
          ],

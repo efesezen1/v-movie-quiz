@@ -30,6 +30,7 @@
                      <ul class="list-none p-0 m-0 overflow-hidden">
                         <li>
                            <RouterLink
+                              @click="closeCallback"
                               to="/"
                               class="flex items-center cursor-pointer p-4 rounded text-surface-700 hover:bg-surface-100 dark:text-surface-0 dark:hover:bg-surface-800 duration-150 transition-colors p-ripple"
                            >
@@ -50,6 +51,7 @@
                      <ul class="list-none p-0 m-0 overflow-hidden">
                         <li>
                            <RouterLink
+                              @click="closeCallback"
                               to="/trivia"
                               class="flex items-center cursor-pointer p-4 rounded text-surface-700 hover:bg-surface-100 dark:text-surface-0 dark:hover:bg-surface-800 duration-150 transition-colors p-ripple"
                            >
@@ -59,6 +61,7 @@
                         </li>
                         <li>
                            <RouterLink
+                              @click="closeCallback"
                               to="/movie"
                               class="flex items-center cursor-pointer p-4 rounded text-surface-700 hover:bg-surface-100 dark:text-surface-0 dark:hover:bg-surface-800 duration-150 transition-colors p-ripple"
                            >
