@@ -12,6 +12,7 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 const header = ref([
    { letter: 'T', color: 'text-red-500 ' }, // Red
    { letter: 'R', color: 'text-orange-500 ' }, // Orange

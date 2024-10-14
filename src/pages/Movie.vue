@@ -29,67 +29,10 @@
             />
          </div>
       </div>
-      <Drawer
-         v-model:visible="displaySettingDrawer"
-         header="Settings"
-         position="bottom"
-         style="height: 40vh"
-      >
-         <template #header>
-            <div class="flex items-center gap-2">
-               <Avatar shape="circle" class="pi pi-cog" />
-               <span class="font-bold">Settings</span>
-            </div>
-         </template>
-         <div class="mt-5 d-flex flex-row gap-10">
-            <FloatLabel class="w-full mb-10">
-               <Select
-                  v-model="selectedCategory"
-                  showClear
-                  :loading="isCategoryLoading"
-                  :options="categoryOptions"
-                  optionLabel="name"
-                  optionValue="id"
-                  class="w-full"
-                  id="category-select"
-               />
-               <label for="category-select">{{
-                  selectedCategory ? 'Category' : 'Set Category'
-               }}</label>
-            </FloatLabel>
-            <FloatLabel class="w-full mb-10">
-               <Select
-                  v-model="selectedDifficulty"
-                  showClear
-                  :options="difficultyOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  class="w-full"
-                  id="difficulty-select"
-               />
-               <label for="difficulty-select">{{
-                  selectedDifficulty ? 'Difficulty' : 'Set Difficulty'
-               }}</label>
-            </FloatLabel>
-         </div>
-
-         <template #footer>
-            <div class="flex items-center gap-2">
-               <Button
-                  :label="categorizedPlayLabel"
-                  :loading="categorizedPlayLoading"
-                  icon="pi pi-play"
-                  class="flex-auto"
-                  :outlined="settingPlayButtonOutline"
-                  @click="playCategorizedGame"
-               ></Button>
-            </div>
-         </template>
-      </Drawer>
    </div>
    <div
       class="flex flex-col min-h-[94vh] items-center mx-auto justify-between"
-      v-if="gameStatus === 'started'"
+      v-else-if="gameStatus === 'started'"
    >
       <div class="w-full">
          <div class="pt-[10%] flex flex-col items-center">
@@ -301,11 +244,11 @@
 </template>
 
 <script setup>
+import { ref, computed, watch, onMounted } from 'vue'
 import canonizeText from '@/utils/CanonicalizeText'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { _ } from 'lodash'
 import axios from 'axios'
-import { onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 const gameStatus = ref('notStarted')
 const displayDirector = ref(true)

@@ -59,6 +59,7 @@
 </template>
 
 <script setup>
+import { ref, computed, watch, onMounted, toRefs } from 'vue'
 const currentItemIndex = ref(0)
 const props = defineProps({
    data: Array,

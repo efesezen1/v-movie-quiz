@@ -231,10 +231,15 @@
 </template>
 
 <script setup>
+import { ref, computed, watch, onMounted, toRaw } from 'vue'
+import QuestionNavigation from '@/components/QuestionNavigation.vue'
+import TriviaTitle from '@/components/TriviaTitle.vue'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useToast } from 'primevue/usetoast'
-const toast = useToast()
 import mockData from '../utils/MockData'
 import { vConfetti } from '@neoconfetti/vue'
+
+const toast = useToast()
 import axios from 'axios'
 const qNavVisible = ref(false)
 const minutes = (x) => x * 60 * 1000
