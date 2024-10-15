@@ -2,11 +2,11 @@
    <div
       v-if="gameStatus === 'notStarted'"
       style="background-image: url('./confetti.png'); background-size: cover"
-      class="w-full h-[94vh] text-xl px-4 py-2 flex flex-col justify-center items-start"
+      class="w-full h-[94vh] text-xl px-4 py-2 flex flex-col justify-center items-start md:items-center"
    >
       <Toast position="top-center" />
       <div class="mb-60">
-         <h1 class="text-9xl font-bold">
+         <h1 class="text-9xl font-bold md:text-center">
             <span class="text-8xl flex flex-row">
                <span class="text-red-500"> M </span>
                <span class="text-orange-500"> O </span>
@@ -16,7 +16,7 @@
             </span>
             Quiz
          </h1>
-         <div class="flex flex-row gap-4">
+         <div class="flex flex-row gap-4 md:items-center md:justify-center">
             <Button
                @click="
                   () => {
@@ -24,7 +24,7 @@
                   }
                "
                severity="warn"
-               class="mt-10"
+               class="mt-10 w-full"
                label="Start Game"
             />
          </div>
@@ -35,8 +35,8 @@
       v-else-if="gameStatus === 'started'"
    >
       <div class="w-full">
-         <div class="pt-[10%] flex flex-col items-center">
-            <div class="w-[90%] flex justify-between mb-2">
+         <div class="pt-[10%] md:pt-5 flex flex-col items-center">
+            <div class="w-[90%] md:w-[70%] flex justify-between mb-2">
                <Button
                   icon="pi pi-arrow-left"
                   severity="success"
@@ -60,12 +60,15 @@
                :src="currentMovie.download"
                :key="currentMovie.clipID"
                type="video/mp4"
+               class="w-[90%] md:w-[70%] lg:w-[50%] xl:w-[30%]"
             >
                Your browser does not support the video tag.
             </video>
             <ProgressSpinner v-else />
          </div>
-         <div class="w-[90%] flex flex-col items-center justify-center mx-auto">
+         <div
+            class="w-[90%] md:w-[70%] lg:w-[50%] xl:w-[30%] flex flex-col items-center justify-center mx-auto"
+         >
             <span
                class="w-full mt-5"
                v-if="answerStatus !== 'idle' || answerStatus !== 'correct'"
@@ -85,15 +88,6 @@
                      "
                      @keyup.enter="checkAnswer(answer, currentMovie)"
                   />
-                  <!-- <InputText
-                  type="text"
-                  :disabled="
-                  answerStatus === 'over' || answerStatus === 'correct'
-                  "
-                  v-model="answer"
-                  class="w-[80%] m-auto my-5 !rounded-r-none"
-                  @keyup.enter="checkAnswer(answer, currentMovie)"
-                  /> -->
 
                   <!-- . . . SUBMIT SEC . . . -->
                   <div class="min-w-[30%] h-full">
@@ -126,7 +120,7 @@
                </InputGroup>
             </span>
             <!-- . . . ANSWERS SEC . . . -->
-            <span class="w-full">
+            <span class="w-[80%]">
                <TransitionGroup tag="ul" name="fade" class="list-container">
                   <li v-for="item in answers" class="w-full mb-1" :key="item">
                      {{
@@ -159,9 +153,9 @@
             </Transition>
          </div>
       </div>
-      <div class="w-[90%] mb-3 flex flex-col gap-2">
+      <div class="w-[90%] mb-3 flex flex-col gap-2 md:flex-row">
          <div
-            class="w-full grid grid-cols-2 grid-flow-col"
+            class="w-full grid grid-cols-2 grid-flow-col md:grid-rows-2 md:grid-flow-col md:grid-cols-1"
             v-if="currentMovie.movie_director"
          >
             <ToggleButton
@@ -183,7 +177,7 @@
             </Transition>
          </div>
          <div
-            class="w-full grid grid-cols-2 grid-flow-col"
+            class="w-full grid grid-cols-2 grid-flow-col md:grid-rows-2 md:grid-flow-col md:grid-cols-1"
             v-if="currentMovie.movie_year"
          >
             <ToggleButton
@@ -206,7 +200,7 @@
             </Transition>
          </div>
          <div
-            class="w-full grid grid-cols-2 grid-flow-col"
+            class="w-full grid grid-cols-2 grid-flow-col md:grid-rows-2 md:grid-flow-col md:grid-cols-1"
             v-if="currentMovie.characters"
          >
             <ToggleButton

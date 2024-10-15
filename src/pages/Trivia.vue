@@ -2,9 +2,8 @@
    <div
       v-if="gameStatus === 'notStarted'"
       style="background-image: url('./confetti.png'); background-size: cover"
-      class="w-full h-[94vh] text-xl px-4 py-2 flex flex-col justify-center items-start"
+      class="w-full h-[94vh] text-xl px-4 py-2 flex flex-col justify-center items-start md:items-center"
    >
-      <Toast position="top-center" />
       <div class="mb-60">
          <h1 class="text-9xl font-bold">
             <span class="text-8xl flex flex-row">
@@ -17,7 +16,7 @@
             </span>
             Quiz
          </h1>
-         <div class="flex flex-row gap-4">
+         <div class="flex flex-row gap-4 md:justify-center">
             <Button
                @click="
                   () => {
@@ -26,11 +25,11 @@
                   }
                "
                severity="warn"
-               class="mt-10"
+               class="mt-10 w-full"
                label="Flash Game"
             />
             <Button
-               class="mt-10"
+               class="mt-10 w-full"
                label="Game Settings"
                @click="displaySettingDrawer = true"
             />
@@ -48,7 +47,7 @@
                <span class="font-bold">Settings</span>
             </div>
          </template>
-         <div class="mt-5 d-flex flex-row gap-10">
+         <div class="mt-5 flex flex-col md:flex-row gap-10">
             <FloatLabel class="w-full mb-10">
                <Select
                   v-model="selectedCategory"
@@ -79,9 +78,18 @@
                }}</label>
             </FloatLabel>
          </div>
+         <div class="hidden md:flex md:gap-4 justify-end md:w-full">
+            <Button
+               :label="categorizedPlayLabel"
+               :loading="categorizedPlayLoading"
+               icon="pi pi-play"
+               :outlined="settingPlayButtonOutline"
+               @click="playCategorizedGame"
+            />
+         </div>
 
          <template #footer>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 md:hidden">
                <Button
                   :label="categorizedPlayLabel"
                   :loading="categorizedPlayLoading"
@@ -140,13 +148,16 @@
          <div
             class="flex flex-col items-center relative h-[55vh] justify-center"
          >
-            <div v-html="currentQuestion" class="w-10/12"></div>
+            <div
+               v-html="currentQuestion"
+               class="w-10/12 md:text-3xl md:mb-10"
+            ></div>
 
             <div
-               class="flex flex-col gap-4 w-full justify-center items-center my-4"
+               class="flex flex-col gap-4 w-full justify-center items-center md:flex-row my-4"
             >
                <Button
-                  class="w-10/12"
+                  class="w-10/12 md:w-[20vw] md:h-[20vw]"
                   :outlined="!option.isSelected"
                   v-for="option in currentOptions"
                   :key="option.text"
@@ -209,7 +220,7 @@
          v-model:visible="answerDrawer"
          header="Answers"
          position="bottom"
-         style="max-height: 100vh; min-height: 43vh; overflow-y: scroll"
+         class="md:min-h-[45vh] min-h-[70vh] max-h-[100vh] overflow-y-scroll"
       >
          <div
             class="flex flex-col gap-4 w-full justify-center items-center my-4"

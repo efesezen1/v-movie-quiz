@@ -1,7 +1,7 @@
 <template>
    <div
       style="background-image: url('./confetti.png'); background-size: cover"
-      class="w-full h-[94vh] text-xl px-4 py-2 flex flex-col justify-center items-start"
+      class="w-full h-[94vh] text-xl px-4 py-2 flex flex-col justify-center items-start md:items-center"
    >
       <Toast position="top-center" />
       <div class="mb-60">
@@ -13,7 +13,7 @@
                <Button
                   @click="router.push('/trivia')"
                   severity="warn"
-                  class="w-[30vw] h-[30vw]"
+                  class="w-[30vw] h-[30vw] md:w-full md:h-full"
                   label="Trivia Quiz"
                />
             </Transition>
@@ -21,7 +21,7 @@
                <Button
                   @click="router.push('/movie')"
                   severity="danger"
-                  class="w-[30vw] h-[30vw]"
+                  class="w-[30vw] h-[30vw] md:w-full md:h-full"
                   label="Movie Quiz"
                />
             </Transition>
