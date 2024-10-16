@@ -279,9 +279,10 @@ const settingPlayButtonOutline = ref(true)
 const isCategorized = ref(false)
 const queryClient = useQueryClient()
 const answerDrawer = ref(false)
+const baseURL = 'https://opentdb.com/api.php?amount=10&type=multiple'
 const categorizedUrl = computed(
    () =>
-      `https://the-trivia-api.com/api/questions?limit=10${
+      `${baseURL}${
          selectedDifficulty.value
             ? `&difficulty=${selectedDifficulty.value}`
             : ''
@@ -301,8 +302,8 @@ const fetchCategorizedData = async () => {
       queryFn: async () => {
          try {
             const response = await axios.get(categorizedUrl.value)
-            console.log(...categorizedUrl.value)
-            const data = response.data
+            console.log(categorizedUrl.value)
+            const data = response.data.results
             const optimizedData = quizzify(data)
             console.log(data)
             return optimizedData
@@ -368,10 +369,10 @@ const difficultyOptions = ref([
 
 const quizzify = (data) => {
    return data.map((item, index) => {
-      const options_ = shuffle([...item.incorrectAnswers, item.correctAnswer])
+      const options_ = shuffle([...item.incorrect_answers, item.correct_answer])
       const options = options_.map((option, index) => {
          return {
-            isAnswer: option === item.correctAnswer,
+            isAnswer: option === item.correct_answer,
             text: option,
             isSelected: false,
             isButtonDisabled: false,
@@ -385,29 +386,58 @@ const quizzify = (data) => {
       }
    })
 }
-const {
-   data: queryBaseData,
-   isLoading,
-   isError,
-   error,
-   refetch: refetchBaseQuestions,
-} = useQuery({
-   queryKey: ['questions'],
-   queryFn: async () => {
-      try {
-         const response = await axios.get(
-            'https://the-trivia-api.com/api/questions?limit=10'
-         )
-         const data = response.data
-         const optimizedData = quizzify(data)
+// const {
+//    data: queryBaseData,
+//    isLoading,
+//    isError,
+//    error,
+//    refetch: refetchBaseQuestions,
+// } = useQuery({
+//    queryKey: ['questions'],
+//    queryFn: async () => {
+//       try {
+//          const response = await axios.get(
+//             'https://the-trivia-api.com/api/questions?limit=10'
+//          )
+//          const data = response.data
+//          const optimizedData = quizzify(data)
 
-         return optimizedData
-      } catch (error) {
-         throw new Error(error.message)
-      }
-   },
-   initialData: mockData,
-   refetchOnWindowFocus: false,
+//          return optimizedData
+//       } catch (error) {
+//          throw new Error(error.message)
+//       }
+//    },
+//    initialData: mockData,
+//    refetchOnWindowFocus: false,
+// })
+
+const queryBaseData = ref([])
+const isLoading = ref(false)
+const fetchQuestions = async () => {
+   const data = await queryClient.fetchQuery({
+      queryKey: ['questions'],
+      queryFn: async () => {
+         try {
+            const response = await axios.get(baseURL)
+            const data = response.data.results
+            console.log('This is from OPEN TRIVIA DB', data)
+            const optimizedData = quizzify(data)
+            return optimizedData
+         } catch (error) {
+            throw new Error(error.message)
+         }
+      },
+      refetchOnWindowFocus: false,
+   })
+   return data
+}
+
+onMounted(async () => {
+   isLoading.value = true
+   const data = await fetchQuestions()
+   isLoading.value = false
+   console.log('onMounted Data from OPEN TRIVIA DB', data)
+   queryBaseData.value = toRaw(data)
 })
 
 const { data: categoryOptions, isLoading: isCategoryLoading } = useQuery({
