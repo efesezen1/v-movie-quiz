@@ -55,6 +55,7 @@
             </div>
          </template>
          <div class="mt-5 flex flex-col md:flex-row gap-10">
+            <!-- . . . SELECTED CATEGORY -->
             <FloatLabel class="w-full mb-10">
                <Select
                   v-model="selectedCategory"
@@ -70,6 +71,7 @@
                   selectedCategory ? 'Category' : 'Set Category'
                }}</label>
             </FloatLabel>
+            <!-- . . . SELECTED DIFFICULTY -->
             <FloatLabel class="w-full mb-10">
                <Select
                   v-model="selectedDifficulty"
@@ -82,6 +84,30 @@
                />
                <label for="difficulty-select">{{
                   selectedDifficulty ? 'Difficulty' : 'Set Difficulty'
+               }}</label>
+            </FloatLabel>
+            <!-- . . . SELECTED TIME -->
+            <FloatLabel class="w-full mb-10">
+               <Select
+                  v-model="selectedTime"
+                  :options="timeOptions"
+                  class="w-full"
+                  id="time-select"
+               />
+               <label for="difficulty-select">{{
+                  selectedDifficulty ? 'Time' : 'Set Time'
+               }}</label>
+            </FloatLabel>
+            <!-- . . . SELECTED QUESTION NUMBER -->
+            <FloatLabel class="w-full mb-10">
+               <Select
+                  v-model="selectedQuestionNum"
+                  :options="questionNumOptions"
+                  class="w-full"
+                  id="question-num-select"
+               />
+               <label for="difficulty-select">{{
+                  selectedDifficulty ? 'Question Number' : 'Set Question Number'
                }}</label>
             </FloatLabel>
          </div>
@@ -104,7 +130,7 @@
                   class="flex-auto"
                   :outlined="settingPlayButtonOutline"
                   @click="playCategorizedGame"
-               ></Button>
+               />
             </div>
          </template>
       </Drawer>
@@ -123,12 +149,18 @@
             totalMilliseconds,
          }"
          @progress="
-            (data) => (data.totalSeconds === 0 ? (gameStatus = 'over') : null)
+            (data) => {
+               data.totalSeconds === 0 ? (gameStatus = 'over') : null
+
+               timeRemainingPercentage =
+                  ((gameTimeRange - data.totalMilliseconds) / gameTimeRange) *
+                  100
+            }
          "
          @end="gameStatus = 'over'"
       >
          <ProgressBar
-            :value="parseInt(gameTimeRange * 100)"
+            :value="parseInt(timeRemainingPercentage)"
             :showValue="false"
             class="w-full"
             style="border-radius: 0px; height: 0.1rem"
@@ -151,7 +183,10 @@
             @question:clicked="moveCursor"
             :key="cursor + gameStatus"
             v-model:display="qNavVisible"
+            :selectedQuestionNum="selectedQuestionNum"
+
          />
+
          <div
             class="flex flex-col items-center relative h-[55vh] justify-center"
          >
@@ -163,10 +198,11 @@
             <div
                class="flex flex-col gap-4 w-full justify-center items-center md:flex-row my-4"
             >
-               <Button
+               <!-- QUESTION OPTIONS (XYZ) -->
+               <!-- <Button
+                  v-for="option in currentOptions"
                   class="w-10/12 md:w-[20vw] md:h-[20vw]"
                   :outlined="!option.isSelected"
-                  v-for="option in currentOptions"
                   :key="option.text"
                   :disabled="option.isButtonDisabled"
                   :label="option.text"
@@ -176,6 +212,22 @@
                         ? option.isAnswer === false
                            ? 'danger'
                            : 'success'
+                        : 'info'
+                  "
+               /> -->
+               <Button
+                  v-for="option in currentOptions"
+                  class="w-10/12 md:w-[20vw] md:h-[20vw]"
+                  :outlined="!option.isSelected"
+                  :key="option.text"
+                  :disabled="option.isButtonDisabled"
+                  :label="option.text"
+                  @click="answer(data[cursor], option)"
+                  :severity="
+                     currentContext.questionStatus === 'answered'
+                        ? option.isAnswer === true
+                           ? 'success'
+                           : 'danger'
                         : 'info'
                   "
                />
@@ -268,8 +320,7 @@ import { vConfetti } from '@neoconfetti/vue'
 const toast = useToast()
 import axios from 'axios'
 const qNavVisible = ref(false)
-const minutes = (x) => x * 60 * 1000
-const gameTimeRange = ref(minutes(3))
+
 const displaySettingDrawer = ref(false)
 const gameStatus = ref('notStarted')
 const data = ref([])
@@ -279,7 +330,14 @@ const settingPlayButtonOutline = ref(true)
 const isCategorized = ref(false)
 const queryClient = useQueryClient()
 const answerDrawer = ref(false)
-const baseURL = 'https://opentdb.com/api.php?amount=10&type=multiple'
+const selectedTime = ref(20)
+const timeOptions = ref(Array.from({ length: 8 }, (_, i) => i + 3))
+const minutes = (x) => x * 60 * 1000
+const gameTimeRange = computed(() => minutes(selectedTime.value))
+const timeRemainingPercentage = ref(0)
+const selectedQuestionNum = ref(10)
+const questionNumOptions = ref(Array.from({ length: 41 }, (_, i) => i + 10))
+const baseURL = `https://opentdb.com/api.php?amount=${selectedQuestionNum.value}&type=multiple`
 const categorizedUrl = computed(
    () =>
       `${baseURL}${
@@ -432,12 +490,18 @@ const fetchQuestions = async () => {
    return data
 }
 
-onMounted(async () => {
+const fetchMechanism = async () => {
    isLoading.value = true
    const data = await fetchQuestions()
    isLoading.value = false
    console.log('onMounted Data from OPEN TRIVIA DB', data)
    queryBaseData.value = toRaw(data)
+}
+
+const refetchBaseQuestions = async () => fetchMechanism()
+
+onMounted(async () => {
+   await fetchMechanism()
 })
 
 const { data: categoryOptions, isLoading: isCategoryLoading } = useQuery({
@@ -456,6 +520,7 @@ const { data: categoryOptions, isLoading: isCategoryLoading } = useQuery({
 })
 
 watch(queryBaseData, () => {
+   console.log('queryBaseData', queryBaseData.value[cursor.value])
    data.value = toRaw(queryBaseData.value ?? [])
 })
 
@@ -515,6 +580,11 @@ const score = computed(() => {
 })
 let cursor = ref(0)
 
+const currentContext = computed(() => {
+   if (data.value.length === 0) return ''
+   return data.value[cursor.value]
+})
+
 const currentQuestion = computed(() => {
    if (data.value.length === 0) return ''
    return data.value[cursor.value].question
@@ -522,6 +592,21 @@ const currentQuestion = computed(() => {
 const currentOptions = computed(() => {
    if (data.value.length === 0) return []
    return data.value[cursor.value].options
+})
+
+const answerSeverity = computed(() => {
+   const option = currentOptions.value[cursor.value]
+   console.log(option)
+   console.log(curr.value)
+   if (option.isSelected === true) {
+      if (option.isAnswer === false) {
+         return 'danger'
+      } else {
+         return 'success'
+      }
+   } else {
+      return 'info'
+   }
 })
 
 const restart = () => {
@@ -554,6 +639,7 @@ function shuffle(array) {
 const answer = (currentQuestion_, selected) => {
    selected.isSelected = true
    currentQuestion_.questionStatus = 'answered'
+   data.value[cursor.value].questionStatus = 'answered'
    currentQuestion_.options = currentQuestion_.options.map((item) => {
       return {
          ...item,
@@ -568,6 +654,15 @@ const answer = (currentQuestion_, selected) => {
       moveCursor('next', cursor.value)
    }, 600)
 }
+
+watch(
+   () => data.value[cursor.value],
+   (x) => {
+      console.log('data[value].questionStatus ===>')
+      console.log(x.questionStatus, x.isAnsweredTrue)
+   },
+   { deep: true }
+)
 </script>
 
 <style>
