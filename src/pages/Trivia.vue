@@ -2,9 +2,9 @@
    <div
       v-if="gameStatus === 'notStarted'"
       style="background-image: url('./confetti.png'); background-size: cover"
-      class="w-full h-[94vh] text-xl px-4 py-2 flex flex-col justify-center items-start md:items-center"
+      class="w-full h-[94vh] text-xl px-4 py-2 flex flex-col md:items-center"
    >
-      <div class="mb-60">
+      <div class="relative top-[20%]">
          <h1 class="text-9xl font-bold">
             <span class="text-8xl flex flex-row">
                <span class="text-red-500"> T </span>
@@ -28,18 +28,25 @@
                class="mt-10 w-full"
                label="Flash Game"
             />
-            <Button
-               class="mt-10 w-full"
-               label="Game Settings"
-               @click="displaySettingDrawer = true"
-            />
          </div>
+      </div>
+      <div
+         class="w-full absolute bottom-0 right-0 left-0 flex flex-row-reverse"
+      >
+         <Button
+            icon="pi pi-cog"
+            class="mt-10 w-full m-5"
+            rounded
+            severity="secondary"
+            aria-label="Settings"
+            @click="displaySettingDrawer = true"
+         />
       </div>
       <Drawer
          v-model:visible="displaySettingDrawer"
          header="Settings"
          position="bottom"
-         style="height: 40vh"
+         style="height: 60vh"
       >
          <template #header>
             <div class="flex items-center gap-2">
@@ -272,15 +279,14 @@ const settingPlayButtonOutline = ref(true)
 const isCategorized = ref(false)
 const queryClient = useQueryClient()
 const answerDrawer = ref(false)
-const categorizedUrl = computed(() => [
-   'https://the-trivia-api.com/api/questions?limit=10',
-   {
-      params: {
-         difficulty: selectedDifficulty.value,
-         category: selectedCategory.value,
-      },
-   },
-])
+const categorizedUrl = computed(
+   () =>
+      `https://the-trivia-api.com/api/questions?limit=10${
+         selectedDifficulty.value
+            ? `&difficulty=${selectedDifficulty.value}`
+            : ''
+      }${selectedCategory.value ? `&category=${selectedCategory.value}` : ''}`
+)
 
 const categorizedPlayLoading = ref(false)
 const categorizedPlayLabel = ref('Play Categorized Game')
@@ -294,7 +300,7 @@ const fetchCategorizedData = async () => {
       ],
       queryFn: async () => {
          try {
-            const response = await axios.get(...categorizedUrl.value)
+            const response = await axios.get(categorizedUrl.value)
             console.log(...categorizedUrl.value)
             const data = response.data
             const optimizedData = quizzify(data)
@@ -317,7 +323,7 @@ const playCategorizedGame = async () => {
          severity: 'info',
          summary: 'Hey!',
          detail:
-            'If you do not want to select either difficulty or category, you can play a flash game.',
+            "If you don't want to select either difficulty or category, you can play a flash game.",
          life: 3000,
       })
       console.log('prohibited. please select a difficulty and category')

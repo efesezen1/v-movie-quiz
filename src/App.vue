@@ -4,5 +4,5 @@ import { VueQueryDevtools } from '@tanstack/vue-query-devtools'
 
 <template>
    <RouterView />
-   <VueQueryDevtools />
+   <!-- <VueQueryDevtools /> -->
 </template>
