@@ -178,13 +178,12 @@
       </div>
       <div v-else>
          <QuestionNavigation
+            :key="cursor + gameStatus"
             :data="data"
             :cursor="cursor"
             @question:clicked="moveCursor"
-            :key="cursor + gameStatus"
             v-model:display="qNavVisible"
             :selectedQuestionNum="selectedQuestionNum"
-
          />
 
          <div
@@ -199,22 +198,6 @@
                class="flex flex-col gap-4 w-full justify-center items-center md:flex-row my-4"
             >
                <!-- QUESTION OPTIONS (XYZ) -->
-               <!-- <Button
-                  v-for="option in currentOptions"
-                  class="w-10/12 md:w-[20vw] md:h-[20vw]"
-                  :outlined="!option.isSelected"
-                  :key="option.text"
-                  :disabled="option.isButtonDisabled"
-                  :label="option.text"
-                  @click="answer(data[cursor], option)"
-                  :severity="
-                     option.isSelected === true
-                        ? option.isAnswer === false
-                           ? 'danger'
-                           : 'success'
-                        : 'info'
-                  "
-               /> -->
                <Button
                   v-for="option in currentOptions"
                   class="w-10/12 md:w-[20vw] md:h-[20vw]"
@@ -311,10 +294,9 @@
 <script setup>
 import { ref, computed, watch, onMounted, toRaw } from 'vue'
 import QuestionNavigation from '@/components/QuestionNavigation.vue'
-import TriviaTitle from '@/components/TriviaTitle.vue'
+
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useToast } from 'primevue/usetoast'
-import mockData from '../utils/MockData'
 import { vConfetti } from '@neoconfetti/vue'
 
 const toast = useToast()
@@ -331,21 +313,29 @@ const isCategorized = ref(false)
 const queryClient = useQueryClient()
 const answerDrawer = ref(false)
 const selectedTime = ref(20)
+let cursor = ref(0)
 const timeOptions = ref(Array.from({ length: 8 }, (_, i) => i + 3))
 const minutes = (x) => x * 60 * 1000
 const gameTimeRange = computed(() => minutes(selectedTime.value))
 const timeRemainingPercentage = ref(0)
 const selectedQuestionNum = ref(10)
 const questionNumOptions = ref(Array.from({ length: 41 }, (_, i) => i + 10))
-const baseURL = `https://opentdb.com/api.php?amount=${selectedQuestionNum.value}&type=multiple`
+const baseURL = computed(
+   () =>
+      `https://opentdb.com/api.php?amount=${selectedQuestionNum.value}&type=multiple`
+)
 const categorizedUrl = computed(
    () =>
-      `${baseURL}${
+      `${baseURL.value}${
          selectedDifficulty.value
             ? `&difficulty=${selectedDifficulty.value}`
             : ''
       }${selectedCategory.value ? `&category=${selectedCategory.value}` : ''}`
 )
+
+watch(selectedQuestionNum, () => {
+   console.log(selectedQuestionNum.value)
+})
 
 const categorizedPlayLoading = ref(false)
 const categorizedPlayLabel = ref('Play Categorized Game')
@@ -360,7 +350,6 @@ const fetchCategorizedData = async () => {
       queryFn: async () => {
          try {
             const response = await axios.get(categorizedUrl.value)
-            console.log(categorizedUrl.value)
             const data = response.data.results
             const optimizedData = quizzify(data)
             console.log(data)
@@ -476,9 +465,9 @@ const fetchQuestions = async () => {
       queryKey: ['questions'],
       queryFn: async () => {
          try {
-            const response = await axios.get(baseURL)
+            // console.log(baseURL.value)
+            const response = await axios.get(baseURL.value)
             const data = response.data.results
-            console.log('This is from OPEN TRIVIA DB', data)
             const optimizedData = quizzify(data)
             return optimizedData
          } catch (error) {
@@ -494,7 +483,7 @@ const fetchMechanism = async () => {
    isLoading.value = true
    const data = await fetchQuestions()
    isLoading.value = false
-   console.log('onMounted Data from OPEN TRIVIA DB', data)
+   // console.log('onMounted Data from OPEN TRIVIA DB', data)
    queryBaseData.value = toRaw(data)
 }
 
@@ -520,7 +509,7 @@ const { data: categoryOptions, isLoading: isCategoryLoading } = useQuery({
 })
 
 watch(queryBaseData, () => {
-   console.log('queryBaseData', queryBaseData.value[cursor.value])
+   // console.log('queryBaseData', queryBaseData.value[cursor.value])
    data.value = toRaw(queryBaseData.value ?? [])
 })
 
@@ -578,7 +567,6 @@ const score = computed(() => {
       data.value.length
    }`
 })
-let cursor = ref(0)
 
 const currentContext = computed(() => {
    if (data.value.length === 0) return ''
@@ -592,21 +580,6 @@ const currentQuestion = computed(() => {
 const currentOptions = computed(() => {
    if (data.value.length === 0) return []
    return data.value[cursor.value].options
-})
-
-const answerSeverity = computed(() => {
-   const option = currentOptions.value[cursor.value]
-   console.log(option)
-   console.log(curr.value)
-   if (option.isSelected === true) {
-      if (option.isAnswer === false) {
-         return 'danger'
-      } else {
-         return 'success'
-      }
-   } else {
-      return 'info'
-   }
 })
 
 const restart = () => {
@@ -654,15 +627,6 @@ const answer = (currentQuestion_, selected) => {
       moveCursor('next', cursor.value)
    }, 600)
 }
-
-watch(
-   () => data.value[cursor.value],
-   (x) => {
-      console.log('data[value].questionStatus ===>')
-      console.log(x.questionStatus, x.isAnsweredTrue)
-   },
-   { deep: true }
-)
 </script>
 
 <style>

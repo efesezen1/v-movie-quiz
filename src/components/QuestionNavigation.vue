@@ -1,7 +1,7 @@
 <template>
    <div>
-      <!-- v-if="selectedQuestionNum <= 9" -->
       <SpeedDial
+         v-if="selectedQuestionNum <= 10"
          :model="items"
          :radius="150"
          :visible="qNavVisible ? true : false"
@@ -13,7 +13,7 @@
          :rotate-animation="false"
          direction="up"
          class="absolute bottom-4"
-         style="position: absolute; left: calc(50% - 2rem)"
+         style="position: absolute; left: calc(50% - 1.2rem)"
       >
          <template #item="{ item, toggleCallback }">
             <div
@@ -26,8 +26,6 @@
                      toggleCallback(e)
                "
             >
-               <!-- @click="console.log(item)" -->
-               <!-- @click="emit('question:clicked', 'to', index)" -->
                <small>{{
                   item.questionStatus === 'unanswered'
                      ? item.index + 1
@@ -39,14 +37,30 @@
             </div>
          </template>
       </SpeedDial>
-      <!-- <div v-else class="absolute bottom-4 w-full bg-red-300 h-[4rem]">
-         
-      </div> -->
+      <div
+         v-else
+         class="absolute bottom-4 w-full h-[4rem] overflow-x-auto flex justify-center items-center"
+      >
+         <Paginator
+            :totalRecords="items.length"
+            @update:first="
+               (e) => {
+                  emit('question:clicked', 'to', e)
+               }
+            "
+            :rows="1"
+            :pageLinkSize="5"
+            :first="cursor"
+            :template="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink'"
+         >
+         </Paginator>
+      </div>
    </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, toRefs } from 'vue'
+import Paginator from 'primevue/paginator'
+import { ref, watch, toRefs } from 'vue'
 const currentItemIndex = ref(0)
 const props = defineProps({
    data: Array,

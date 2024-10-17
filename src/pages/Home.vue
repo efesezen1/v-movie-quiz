@@ -34,7 +34,6 @@ import TriviaTitle from '../components/TriviaTitle.vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-console.log(router)
 </script>
 
 <style lang="scss" scoped></style>
