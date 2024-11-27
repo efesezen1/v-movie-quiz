@@ -120,36 +120,61 @@
                </InputGroup>
             </span>
             <!-- . . . ANSWERS SEC . . . -->
-            <span class="w-[80%]">
-               <TransitionGroup tag="ul" name="fade" class="list-container">
-                  <li v-for="item in answers" class="w-full mb-1" :key="item">
-                     {{
-                        item.answerStatus === 'correct'
-                           ? '✅'
-                           : item.answerStatus === 'wrong'
-                           ? '💥'
-                           : item.answerStatus === 'passed'
-                           ? '⚪️'
-                           : ''
-                     }}
-                     <!-- {{ item.answerStatus }} -->
-                     {{ item.answer }}
+            <span class="w-[80%] mt-4">
+               <TransitionGroup
+                  tag="ul"
+                  name="fade"
+                  class="list-container space-y-2"
+               >
+                  <li
+                     v-for="item in answers"
+                     :key="item"
+                     class="w-full p-3 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md flex items-center gap-2"
+                     :class="{
+                        ' border-l-4 border-green-500 dark:text-gray-200':
+                           item.answerStatus === 'correct',
+                        ' border-l-4 border-red-500 dark:text-gray-200':
+                           item.answerStatus === 'wrong',
+                        ' border-l-4 border-gray-400 dark:border-gray-600 dark:text-gray-300':
+                           item.answerStatus === 'passed',
+                     }"
+                  >
+                     <span class="text-xl">
+                        {{
+                           item.answerStatus === 'correct'
+                              ? '✅'
+                              : item.answerStatus === 'wrong'
+                              ? '❌'
+                              : item.answerStatus === 'passed'
+                              ? '⏭️'
+                              : ''
+                        }}
+                     </span>
+                     <span class="flex-1">{{ item.answer }}</span>
                   </li>
                </TransitionGroup>
             </span>
             <!-- . . . ANSWER REVEAL SEC . . . -->
             <Transition name="fade">
-               <span
+               <div
                   v-if="
                      answers.length >= replyNum ||
                      answerStatus === 'correct' ||
                      answerStatus === 'over'
                   "
-                  class="relative my-4 text-center"
+                  class="relative my-6 text-center bg-purple-950 p-4 rounded-lg shadow-md w-[80%]"
                >
-                  <p>answer</p>
-                  <p class="text-2xl">{{ currentMovie.movie_title }}</p>
-               </span>
+                  <p
+                     class="text-purple-50 dark:text-purple-300 font-medium mb-2"
+                  >
+                     The answer is
+                  </p>
+                  <p
+                     class="text-2xl font-bold text-purple-50 dark:text-purple-100"
+                  >
+                     {{ currentMovie.movie_title }}
+                  </p>
+               </div>
             </Transition>
          </div>
       </div>
@@ -325,6 +350,7 @@ const { data, refetch } = useQuery({
       })
 
       movieData.value.push(...data)
+      console.log(movieData.value)
       return data
    },
    initialData: [],
@@ -462,27 +488,29 @@ const setInitialState = () => {
 <style>
 .list-container {
    position: relative;
-   padding: 0;
-   list-style-type: none;
 }
 
-/* 1. declare transition */
 .fade-move,
 .fade-enter-active,
 .fade-leave-active {
-   transition: all 0.5s cubic-bezier(0.55, 0, 0.1, 1);
+   transition: all 0.3s ease;
 }
 
-/* 2. declare enter from and leave to state */
 .fade-enter-from,
 .fade-leave-to {
    opacity: 0;
-   transform: scaleY(0.01) translate(30px, 0);
+   transform: translateX(-30px);
 }
 
-/* 3. ensure leaving items are taken out of layout flow so that moving
-      animations can be calculated correctly. */
 .fade-leave-active {
    position: absolute;
+}
+
+li {
+   transition: all 0.3s ease;
+}
+
+li:hover {
+   transform: translateX(4px);
 }
 </style>

@@ -250,17 +250,7 @@
                   <span class="text-purple-900">{{ score }}</span>
                </span>
             </div>
-            <div class="w-10/12 flex justify-end">
-               <Button
-                  severity="warn"
-                  class="text-slate-100 pass-button transition-all duration-300 hover:transform hover:scale-105"
-                  icon="pi pi-angle-double-right"
-                  label="Pass"
-                  @click="moveCursor('pass', cursor)"
-               >
-                  <span class="pass-tooltip">Skip this question</span>
-               </Button>
-            </div>
+            
          </div>
       </div>
    </div>
