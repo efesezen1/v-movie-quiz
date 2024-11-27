@@ -349,7 +349,11 @@ const { data, refetch } = useQuery({
          return item
       })
 
-      movieData.value.push(...data)
+      // Check for duplicates based on clipID before pushing
+      const newData = data.filter(newItem => 
+         !movieData.value.some(existingItem => existingItem.clipID === newItem.clipID)
+      )
+      movieData.value.push(...newData)
       console.log(movieData.value)
       return data
    },
