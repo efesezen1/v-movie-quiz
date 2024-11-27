@@ -18,7 +18,7 @@
          </template>
       </Menubar>
       <TriviaDrawer v-model:visible="visible" />
-      <RouterView v-slot="{ Component }">
+      <RouterView v-slot="{ Component }" class="w-full">
          <Transition name="fade">
             <component :is="Component" />
          </Transition>

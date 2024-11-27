@@ -8,95 +8,145 @@
 
                   <TriviaTitle />
                </span>
-               <!-- <span>
-                  <Button
-                     type="button"
-                     @click="closeCallback"
-                     icon="pi pi-times"
-                     rounded
-                     outlined
-                     severity="warn"
-                  ></Button>
-               </span> -->
             </div>
             <div class="overflow-y-auto">
                <ul class="list-none p-4 m-0">
-                  <li>
+                  <!-- Iterate through main menu items -->
+                  <li v-for="(item, index) in menuItems" :key="index">
                      <div
                         class="p-4 flex items-center justify-between text-surface-500 dark:text-surface-400 cursor-pointer p-ripple"
                      >
-                        <span class="font-medium">APP</span>
+                        <span class="font-medium">{{ item.title }}</span>
                      </div>
                      <ul class="list-none p-0 m-0 overflow-hidden">
-                        <li>
+                        <!-- Iterate through sub-items -->
+                        <li
+                           v-for="(subItem, subIndex) in item.subItems"
+                           :key="subIndex"
+                        >
                            <RouterLink
-                              @click="closeCallback"
-                              to="/"
+                              @click="
+                                 () => {
+                                    closeCallback()
+                                    subItem?.fn?.()
+                                 }
+                              "
+                              :to="subItem.route"
                               class="flex items-center cursor-pointer p-4 rounded text-surface-700 hover:bg-surface-100 dark:text-surface-0 dark:hover:bg-surface-800 duration-150 transition-colors p-ripple"
                            >
-                              <i class="pi pi-home mr-2"></i>
-                              <span class="font-medium">Home</span>
-                           </RouterLink>
-                        </li>
-                     </ul>
-                  </li>
-               </ul>
-               <ul class="list-none p-4 m-0">
-                  <li>
-                     <div
-                        class="p-4 flex items-center justify-between text-surface-500 dark:text-surface-400 cursor-pointer p-ripple"
-                     >
-                        <span class="font-medium">QUIZZES</span>
-                     </div>
-                     <ul class="list-none p-0 m-0 overflow-hidden">
-                        <li>
-                           <RouterLink
-                              @click="closeCallback"
-                              to="/trivia"
-                              class="flex items-center cursor-pointer p-4 rounded text-surface-700 hover:bg-surface-100 dark:text-surface-0 dark:hover:bg-surface-800 duration-150 transition-colors p-ripple"
-                           >
-                              <i class="pi pi-trophy mr-2"></i>
-                              <span class="font-medium">Trivia Quiz</span>
-                           </RouterLink>
-                        </li>
-                        <li>
-                           <RouterLink
-                              @click="closeCallback"
-                              to="/movie"
-                              class="flex items-center cursor-pointer p-4 rounded text-surface-700 hover:bg-surface-100 dark:text-surface-0 dark:hover:bg-surface-800 duration-150 transition-colors p-ripple"
-                           >
-                              <i class="pi pi-video mr-2"></i>
-                              <span class="font-medium">Guess The Movie</span>
+                              <i :class="subItem.icon + ' mr-2'"></i>
+                              <span class="font-medium">{{
+                                 subItem.name
+                              }}</span>
                            </RouterLink>
                         </li>
                      </ul>
                   </li>
                </ul>
             </div>
-            <!-- <div class="mt-auto">
+            <div class="mt-auto" v-if="isLoggedIn">
                <hr
                   class="mb-4 mx-4 border-t border-0 border-surface-200 dark:border-surface-700"
                />
                <a
-                  v-ripple
                   class="m-4 flex items-center cursor-pointer p-4 gap-2 rounded text-surface-700 hover:bg-surface-100 dark:text-surface-0 dark:hover:bg-surface-800 duration-150 transition-colors p-ripple"
                >
                   <Avatar
-                     image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png"
+                     v-if="profilePhotoURL"
+                     :image="profilePhotoURL"
                      shape="circle"
                   />
-                  <span class="font-bold">Amy Elsner</span>
+                  <Avatar
+                     v-else
+                     icon="pi pi-user"
+                     class="mr-2"
+                     size="large"
+                     shape="circle"
+                  />
+
+                  <span class="font-bold">{{ email }}</span>
                </a>
-            </div> -->
+            </div>
          </div>
       </template>
    </Drawer>
 </template>
 
 <script setup>
+import { inject, watch, ref, computed } from 'vue'
 import TriviaTitle from './TriviaTitle.vue'
+import { getAuth } from 'firebase/auth'
 
+const isLoggedIn = inject('isLoggedIn')
+const logout = inject('logout')
+
+// Define visibility for the drawer
 const visible = defineModel('visible')
-</script>
+const email = ref()
+const profilePhotoURL = ref()
+watch(
+   isLoggedIn,
+   (isLoggedIn) => {
+      if (isLoggedIn) {
+         console.log('getAuth().currentUser', getAuth().currentUser)
+         email.value = getAuth().currentUser.email
+         profilePhotoURL.value = getAuth().currentUser.photoURL
+      } else {
+         email.value = null
+      }
+   },
+   { immediate: true }
+)
 
-<style lang="scss" scoped></style>
+// Define the menu items with their sub-items
+const menuItems = computed(() => [
+   {
+      title: 'APP',
+      subItems: [{ name: 'Home', route: '/', icon: 'pi pi-home' }],
+   },
+   {
+      title: 'QUIZZES',
+      subItems: [
+         { name: 'Trivia Quiz', route: '/trivia', icon: 'pi pi-trophy' },
+         { name: 'Guess The Movie', route: '/movie', icon: 'pi pi-video' },
+         { name: 'Feed', route: '/feed', icon: 'pi pi-table' },
+         isLoggedIn.value
+            ? {
+                 name: 'Logout',
+                 fn: logout,
+                 icon: 'pi pi-sign-out',
+                 route: '#',
+              }
+            : {
+                 name: 'Register',
+                 route: '/register',
+                 icon: 'pi pi-sign-in',
+              },
+      ],
+   },
+])
+
+// watch(
+//    isLoggedIn,
+//    () => {
+//       const index = menuItems.findIndex((item) => item.title === 'QUIZZES')
+//       if (isLoggedIn.value) {
+//          menuItems[index].subItems.push({
+//             name: 'Logout',
+//             fn: logout,
+//             icon: 'pi pi-sign-out',
+//             route: '#',
+//          })
+//       } else {
+//          menuItems[index].subItems.push({
+//             name: 'Register',
+//             route: '/register',
+//             icon: 'pi pi-sign-in',
+//          })
+//       }
+//    },
+//    {
+//       immediate: true,
+//    }
+// )
+</script>
