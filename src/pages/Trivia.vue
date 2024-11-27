@@ -225,9 +225,8 @@
                   <div
                      class="flex flex-col items-center justify-center w-full h-full relative"
                   >
-                     <span class="answer-text text-center">{{
-                        option.text
-                     }}</span>
+                     <span class="answer-text text-center" v-html="option.text">
+                     </span>
                      <span
                         v-if="
                            currentContext.questionStatus === 'answered' &&
@@ -250,7 +249,6 @@
                   <span class="text-purple-900">{{ score }}</span>
                </span>
             </div>
-            
          </div>
       </div>
    </div>
@@ -308,9 +306,10 @@
                   >
                      {{ index + 1 }}
                   </div>
-                  <div class="font-medium text-gray-800" v-html="item.question">
-                     
-                  </div>
+                  <div
+                     class="font-medium text-gray-800"
+                     v-html="item.question"
+                  ></div>
                </div>
 
                <div class="ml-11 space-y-2">
