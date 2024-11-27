@@ -195,16 +195,24 @@
             ></div>
 
             <div
-               class="flex flex-col gap-4 w-full justify-center items-center md:flex-row my-4"
+               class="flex flex-col gap-6 w-full justify-center items-center md:flex-row my-8 answer-button-container"
             >
                <!-- QUESTION OPTIONS (XYZ) -->
                <Button
                   v-for="option in currentOptions"
-                  class="w-10/12 md:w-[20vw] md:h-[20vw]"
+                  class="w-10/12 md:w-[20vw] md:h-[15vw] answer-button transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg relative overflow-hidden"
+                  :class="{
+                     'answer-correct':
+                        currentContext.questionStatus === 'answered' &&
+                        option.isAnswer,
+                     'answer-incorrect':
+                        currentContext.questionStatus === 'answered' &&
+                        !option.isAnswer &&
+                        option.isSelected,
+                  }"
                   :outlined="!option.isSelected"
                   :key="option.text"
                   :disabled="option.isButtonDisabled"
-                  :label="option.text"
                   @click="answer(data[cursor], option)"
                   :severity="
                      currentContext.questionStatus === 'answered'
@@ -213,21 +221,45 @@
                            : 'danger'
                         : 'info'
                   "
-               />
+               >
+                  <div
+                     class="flex flex-col items-center justify-center w-full h-full relative"
+                  >
+                     <span class="answer-text text-center">{{
+                        option.text
+                     }}</span>
+                     <span
+                        v-if="
+                           currentContext.questionStatus === 'answered' &&
+                           option.isAnswer
+                        "
+                        class="absolute right-2 top-2"
+                     >
+                        <i
+                           class="pi pi-check-circle text-green-500 text-xl"
+                        ></i>
+                     </span>
+                  </div>
+               </Button>
             </div>
-            <div>
-               <span class="underline">
-                  <i class="pi pi-star-fill text-yellow-500"></i> {{ score }}
+            <div class="score-display mt-4 mb-2 text-xl font-semibold">
+               <span
+                  class="flex items-center gap-2 bg-purple-100 rounded-full px-4 py-2 shadow-md"
+               >
+                  <i class="pi pi-star-fill text-yellow-500 text-2xl"></i>
+                  <span class="text-purple-900">{{ score }}</span>
                </span>
             </div>
             <div class="w-10/12 flex justify-end">
                <Button
                   severity="warn"
-                  class="text-slate-100"
+                  class="text-slate-100 pass-button transition-all duration-300 hover:transform hover:scale-105"
                   icon="pi pi-angle-double-right"
                   label="Pass"
                   @click="moveCursor('pass', cursor)"
-               />
+               >
+                  <span class="pass-tooltip">Skip this question</span>
+               </Button>
             </div>
          </div>
       </div>
@@ -260,30 +292,70 @@
       </div>
       <Drawer
          v-model:visible="answerDrawer"
-         header="Answers"
          position="bottom"
          class="md:min-h-[45vh] min-h-[70vh] max-h-[100vh] overflow-y-scroll"
       >
+         <template #header>
+            <div class="flex items-center gap-3">
+               <i class="pi pi-list text-2xl"></i>
+               <span class="font-bold text-xl">Results: {{ score }}</span>
+            </div>
+         </template>
          <div
-            class="flex flex-col gap-4 w-full justify-center items-center my-4"
+            class="flex flex-col gap-6 w-full justify-center items-center my-4 px-4"
          >
-            <div class="w-11/12" v-for="item in data">
-               <div>
-                  {{ item.isAnsweredTrue ? '✔' : '✘' }} - {{ item.question }}
+            <div
+               v-for="(item, index) in data"
+               class="w-full p-4 rounded-lg shadow-md bg-white hover:shadow-lg transition-all duration-300"
+               :class="{
+                  'border-l-4 border-green-500': item.isAnsweredTrue,
+                  'border-l-4 border-red-500': !item.isAnsweredTrue,
+               }"
+            >
+               <div class="flex items-start gap-3 mb-3">
+                  <div
+                     class="w-8 h-8 rounded-full bg-purple-100 text-purple-800 flex items-center justify-center font-bold text-sm flex-shrink-0"
+                  >
+                     {{ index + 1 }}
+                  </div>
+                  <div class="font-medium text-gray-800" v-html="item.question">
+                     
+                  </div>
                </div>
-               <div>
-                  Correct answer:
-                  {{ item.options.find((option) => option.isAnswer).text }}
-               </div>
-               <div>
-                  {{
-                     item.options.find((option) => option.isSelected)
-                        ? ` Your answer: ${
-                             item.options.find((option) => option.isSelected)
-                                .text
-                          }`
-                        : ''
-                  }}
+
+               <div class="ml-11 space-y-2">
+                  <div
+                     class="flex items-center gap-2 text-green-600 font-medium"
+                  >
+                     <i class="pi pi-check-circle"></i>
+                     <span>{{
+                        item.options.find((option) => option.isAnswer).text
+                     }}</span>
+                  </div>
+
+                  <div
+                     v-if="item.options.find((option) => option.isSelected)"
+                     :class="
+                        item.isAnsweredTrue ? 'text-green-600' : 'text-red-600'
+                     "
+                     class="flex items-center gap-2"
+                  >
+                     <i
+                        :class="
+                           item.isAnsweredTrue ? 'pi pi-check' : 'pi pi-times'
+                        "
+                     ></i>
+                     <span>{{
+                        item.options.find((option) => option.isSelected).text
+                     }}</span>
+                  </div>
+                  <div
+                     v-else
+                     class="text-gray-500 italic flex items-center gap-2"
+                  >
+                     <i class="pi pi-arrow-right"></i>
+                     <span>Question was passed</span>
+                  </div>
                </div>
             </div>
          </div>
@@ -632,16 +704,118 @@ const answer = (currentQuestion_, selected) => {
 <style>
 .p-progressbar {
    position: relative;
-   overflow: hidden;
-   height: var(--p-progressbar-height);
-   background: none !important;
-   border-radius: none;
 }
-.p-progressbar-value {
-   color: red;
-   background-color: yellow;
+
+.answer-button-container {
+   gap: 1rem;
 }
-.p-progressbar-determinate {
-   border-radius: none !important;
+
+.answer-button {
+   position: relative;
+   transition: all 0.3s ease;
+   padding: 0 !important;
+}
+
+.answer-button:hover {
+   transform: translateY(-2px);
+}
+
+.answer-correct {
+   animation: correctAnswer 0.5s ease;
+}
+
+.answer-incorrect {
+   animation: incorrectAnswer 0.5s ease;
+}
+
+.pass-button {
+   position: relative;
+}
+
+.pass-tooltip {
+   position: absolute;
+   bottom: -30px;
+   left: 50%;
+   transform: translateX(-50%);
+   background-color: rgba(0, 0, 0, 0.8);
+   color: white;
+   padding: 4px 8px;
+   border-radius: 4px;
+   font-size: 0.8rem;
+   opacity: 0;
+   transition: opacity 0.3s ease;
+   pointer-events: none;
+}
+
+.pass-button:hover .pass-tooltip {
+   opacity: 1;
+}
+
+.score-display {
+   animation: slideIn 0.5s ease;
+}
+
+@keyframes correctAnswer {
+   0% {
+      transform: scale(1);
+   }
+   50% {
+      transform: scale(1.1);
+   }
+   100% {
+      transform: scale(1);
+   }
+}
+
+@keyframes incorrectAnswer {
+   0% {
+      transform: translateX(0);
+   }
+   25% {
+      transform: translateX(-5px);
+   }
+   75% {
+      transform: translateX(5px);
+   }
+   100% {
+      transform: translateX(0);
+   }
+}
+
+@keyframes slideIn {
+   from {
+      opacity: 0;
+      transform: translateY(-10px);
+   }
+   to {
+      opacity: 1;
+      transform: translateY(0);
+   }
+}
+
+.answer-button.p-button.p-component.p-button-success {
+   background: rgba(34, 197, 94, 0.9) !important;
+   border-color: rgb(34, 197, 94) !important;
+}
+
+.answer-button.p-button.p-component.p-button-danger {
+   background: rgba(239, 68, 68, 0.9) !important;
+   border-color: rgb(239, 68, 68) !important;
+}
+
+.answer-button.p-button.p-component.p-button-info {
+   background: rgba(59, 130, 246, 0.9) !important;
+   border-color: rgb(59, 130, 246) !important;
+}
+
+.answer-button.p-button.p-component.p-button-outlined {
+   background: rgba(255, 255, 255, 0.1) !important;
+   backdrop-filter: blur(8px);
+}
+
+.answer-text {
+   font-size: 1.2rem;
+   padding: 1rem;
+   word-break: break-word;
 }
 </style>

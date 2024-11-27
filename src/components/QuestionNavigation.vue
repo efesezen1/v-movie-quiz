@@ -17,7 +17,7 @@
       >
          <template #item="{ item, toggleCallback }">
             <div
-               class="dark:bg-slate-900 dark:text-white bg-slate-100 text-slate-900 rounded-full w-[40px] h-[40px] flex justify-center items-center transition-all duration-300 text-sm overflow-y-scroll"
+               class="dark:bg-slate-900 dark:text-white rounded-full w-[40px] h-[40px] flex justify-center items-center transition-all duration-300 text-sm overflow-y-scroll question-indicator"
                :class="questionsStyling(item, item.index)"
                :disabled="gameStatus"
                @click="
@@ -60,8 +60,8 @@
 
 <script setup>
 import Paginator from 'primevue/paginator'
-import { ref, watch, toRefs } from 'vue'
-const currentItemIndex = ref(0)
+import { ref, watch, toRefs, computed } from 'vue'
+
 const props = defineProps({
    data: Array,
    cursor: Number,
@@ -72,30 +72,47 @@ const props = defineProps({
 const { data, cursor, gameStatus, selectedQuestionNum } = toRefs(props)
 const qNavVisible = defineModel('display')
 const emit = defineEmits(['question:clicked'])
+
 const questionsStyling = (item, index) => ({
-   'border-4 border-green-500 text-white': item.isAnsweredTrue,
-   'border-4 border-red-500 text-slate-900':
-      item.questionStatus === 'answered' && !item.isAnsweredTrue,
-   'border-4 border-slate-300 text-slate-900':
-      item.questionStatus === 'unanswered',
-   'opacity-80': cursor !== index,
-   ...(gameStatus === 'over'
+   'bg-green-500 text-white': item.isAnsweredTrue,
+   'bg-red-500 text-white': item.questionStatus === 'answered' && !item.isAnsweredTrue,
+   'bg-slate-100 text-slate-900': item.questionStatus === 'unanswered',
+   'opacity-80': cursor.value !== index,
+   'hover:opacity-100': cursor.value !== index,
+   'shadow-md': true,
+   ...(gameStatus.value === 'over'
       ? { 'cursor-default': true }
       : { 'cursor-pointer': true }),
 })
 
-const items = ref([
-   ...data.value.map((item, index) => ({
-      ...item,
-      index,
-      label: item.question,
-      command: () => {
-         // console.log('clicked')
-         currentItemIndex.value = index
-         emit('question:clicked', 'to', index)
-      },
-   })),
-])
+const items = computed(() =>
+   data.value
+      .map((item, index) => ({
+         ...item,
+         index,
+         label: item.question,
+         command: () => {
+            emit('question:clicked', 'to', index)
+         },
+      }))
+      .reverse()
+)
 </script>
 
-<style lang="scss" scoped></style>
+<style>
+.question-indicator {
+   transition: all 0.3s ease;
+}
+
+.question-indicator:hover {
+   transform: translateY(-2px);
+}
+
+.question-indicator.opacity-80 {
+   filter: saturate(0.8);
+}
+
+.question-indicator.opacity-80:hover {
+   filter: saturate(1);
+}
+</style>
