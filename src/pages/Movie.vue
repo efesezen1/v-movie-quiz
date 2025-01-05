@@ -2,11 +2,11 @@
    <div
       v-if="gameStatus === 'notStarted'"
       style="background-image: url('./confetti.png'); background-size: cover"
-      class="w-full h-[94vh] text-xl px-4 py-2 flex flex-col justify-center items-start"
+      class="w-full h-[94vh] text-xl px-4 py-2 flex flex-col justify-center items-start md:items-center"
    >
       <Toast position="top-center" />
       <div class="mb-60">
-         <h1 class="text-9xl font-bold">
+         <h1 class="text-9xl font-bold md:text-center">
             <span class="text-8xl flex flex-row">
                <span class="text-red-500"> M </span>
                <span class="text-orange-500"> O </span>
@@ -16,7 +16,7 @@
             </span>
             Quiz
          </h1>
-         <div class="flex flex-row gap-4">
+         <div class="flex flex-row gap-4 md:items-center md:justify-center">
             <Button
                @click="
                   () => {
@@ -24,7 +24,7 @@
                   }
                "
                severity="warn"
-               class="mt-10"
+               class="mt-10 w-full"
                label="Start Game"
             />
          </div>
@@ -35,8 +35,8 @@
       v-else-if="gameStatus === 'started'"
    >
       <div class="w-full">
-         <div class="pt-[10%] flex flex-col items-center">
-            <div class="w-[90%] flex justify-between mb-2">
+         <div class="pt-[10%] md:pt-5 flex flex-col items-center">
+            <div class="w-[90%] md:w-[70%] flex justify-between mb-2">
                <Button
                   icon="pi pi-arrow-left"
                   severity="success"
@@ -60,12 +60,15 @@
                :src="currentMovie.download"
                :key="currentMovie.clipID"
                type="video/mp4"
+               class="w-[90%] md:w-[70%] lg:w-[50%] xl:w-[30%]"
             >
                Your browser does not support the video tag.
             </video>
             <ProgressSpinner v-else />
          </div>
-         <div class="w-[90%] flex flex-col items-center justify-center mx-auto">
+         <div
+            class="w-[90%] md:w-[70%] lg:w-[50%] xl:w-[30%] flex flex-col items-center justify-center mx-auto"
+         >
             <span
                class="w-full mt-5"
                v-if="answerStatus !== 'idle' || answerStatus !== 'correct'"
@@ -85,15 +88,6 @@
                      "
                      @keyup.enter="checkAnswer(answer, currentMovie)"
                   />
-                  <!-- <InputText
-                  type="text"
-                  :disabled="
-                  answerStatus === 'over' || answerStatus === 'correct'
-                  "
-                  v-model="answer"
-                  class="w-[80%] m-auto my-5 !rounded-r-none"
-                  @keyup.enter="checkAnswer(answer, currentMovie)"
-                  /> -->
 
                   <!-- . . . SUBMIT SEC . . . -->
                   <div class="min-w-[30%] h-full">
@@ -126,42 +120,67 @@
                </InputGroup>
             </span>
             <!-- . . . ANSWERS SEC . . . -->
-            <span class="w-full">
-               <TransitionGroup tag="ul" name="fade" class="list-container">
-                  <li v-for="item in answers" class="w-full mb-1" :key="item">
-                     {{
-                        item.answerStatus === 'correct'
-                           ? '✅'
-                           : item.answerStatus === 'wrong'
-                           ? '💥'
-                           : item.answerStatus === 'passed'
-                           ? '⚪️'
-                           : ''
-                     }}
-                     <!-- {{ item.answerStatus }} -->
-                     {{ item.answer }}
+            <span class="w-[80%] mt-4">
+               <TransitionGroup
+                  tag="ul"
+                  name="fade"
+                  class="list-container space-y-2"
+               >
+                  <li
+                     v-for="item in answers"
+                     :key="item"
+                     class="w-full p-3 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md flex items-center gap-2"
+                     :class="{
+                        ' border-l-4 border-green-500 dark:text-gray-200':
+                           item.answerStatus === 'correct',
+                        ' border-l-4 border-red-500 dark:text-gray-200':
+                           item.answerStatus === 'wrong',
+                        ' border-l-4 border-gray-400 dark:border-gray-600 dark:text-gray-300':
+                           item.answerStatus === 'passed',
+                     }"
+                  >
+                     <span class="text-xl">
+                        {{
+                           item.answerStatus === 'correct'
+                              ? '✅'
+                              : item.answerStatus === 'wrong'
+                              ? '❌'
+                              : item.answerStatus === 'passed'
+                              ? '⏭️'
+                              : ''
+                        }}
+                     </span>
+                     <span class="flex-1">{{ item.answer }}</span>
                   </li>
                </TransitionGroup>
             </span>
             <!-- . . . ANSWER REVEAL SEC . . . -->
             <Transition name="fade">
-               <span
+               <div
                   v-if="
                      answers.length >= replyNum ||
                      answerStatus === 'correct' ||
                      answerStatus === 'over'
                   "
-                  class="relative my-4 text-center"
+                  class="relative my-6 text-center bg-purple-950 p-4 rounded-lg shadow-md w-[80%]"
                >
-                  <p>answer</p>
-                  <p class="text-2xl">{{ currentMovie.movie_title }}</p>
-               </span>
+                  <p
+                     class="text-purple-50 dark:text-purple-300 font-medium mb-2"
+                  >
+                     The answer is
+                  </p>
+                  <p
+                     class="text-2xl font-bold text-purple-50 dark:text-purple-100"
+                  >
+                     {{ currentMovie.movie_title }}
+                  </p>
+               </div>
             </Transition>
          </div>
       </div>
-      <div class="w-[90%] mb-3 flex flex-col gap-2">
+      <div class="w-[90%] mb-3 flex flex-col gap-2 md:flex-row">
          <div
-            class="w-full grid grid-cols-2 grid-flow-col"
+            class="w-full grid grid-cols-2 grid-flow-col md:grid-rows-2 md:grid-flow-col md:grid-cols-1"
             v-if="currentMovie.movie_director"
          >
             <ToggleButton
@@ -183,7 +202,7 @@
             </Transition>
          </div>
          <div
-            class="w-full grid grid-cols-2 grid-flow-col"
+            class="w-full grid grid-cols-2 grid-flow-col md:grid-rows-2 md:grid-flow-col md:grid-cols-1"
             v-if="currentMovie.movie_year"
          >
             <ToggleButton
@@ -206,7 +225,7 @@
             </Transition>
          </div>
          <div
-            class="w-full grid grid-cols-2 grid-flow-col"
+            class="w-full grid grid-cols-2 grid-flow-col md:grid-rows-2 md:grid-flow-col md:grid-cols-1"
             v-if="currentMovie.characters"
          >
             <ToggleButton
@@ -330,7 +349,12 @@ const { data, refetch } = useQuery({
          return item
       })
 
-      movieData.value.push(...data)
+      // Check for duplicates based on clipID before pushing
+      const newData = data.filter(newItem => 
+         !movieData.value.some(existingItem => existingItem.clipID === newItem.clipID)
+      )
+      movieData.value.push(...newData)
+      console.log(movieData.value)
       return data
    },
    initialData: [],
@@ -468,27 +492,29 @@ const setInitialState = () => {
 <style>
 .list-container {
    position: relative;
-   padding: 0;
-   list-style-type: none;
 }
 
-/* 1. declare transition */
 .fade-move,
 .fade-enter-active,
 .fade-leave-active {
-   transition: all 0.5s cubic-bezier(0.55, 0, 0.1, 1);
+   transition: all 0.3s ease;
 }
 
-/* 2. declare enter from and leave to state */
 .fade-enter-from,
 .fade-leave-to {
    opacity: 0;
-   transform: scaleY(0.01) translate(30px, 0);
+   transform: translateX(-30px);
 }
 
-/* 3. ensure leaving items are taken out of layout flow so that moving
-      animations can be calculated correctly. */
 .fade-leave-active {
    position: absolute;
+}
+
+li {
+   transition: all 0.3s ease;
+}
+
+li:hover {
+   transform: translateX(4px);
 }
 </style>

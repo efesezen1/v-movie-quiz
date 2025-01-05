@@ -6,6 +6,7 @@ import PrimeVue from 'primevue/config'
 import 'primeicons/primeicons.css'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import Aura from '@primevue/themes/aura'
+import Paginator from 'primevue/paginator'
 import ToastService from 'primevue/toastservice'
 import Button from 'primevue/button'
 import Drawer from 'primevue/drawer'
@@ -56,6 +57,7 @@ app.use(PrimeVue, presetOptions)
    .component('ProgressSpinner', ProgressSpinner)
    .component('ToggleButton', ToggleButton)
    .component('ProgressBar', ProgressBar)
+   .component('Paginator', Paginator)
    .use(ToastService)
    .use(VueQueryPlugin)
    .use(router)
