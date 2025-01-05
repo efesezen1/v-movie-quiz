@@ -2,6 +2,8 @@
 
 A dynamic and interactive movie trivia game built with Vue 3 and Vite, featuring timed trivia and movie quizzes with a modern UI components powered by PrimeVue.
 
+[Watch the showcase](https://youtube.com/shorts/ryL8bPD36Cc?si=mffNpzFHatfe1ZsT)
+
 ## Features ✨
 
 - **Flash Game Mode**: Quick-paced trivia questions with countdown timer
