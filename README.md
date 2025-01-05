@@ -31,6 +31,7 @@ A dynamic and interactive movie trivia game built with Vue 3 and Vite, featuring
 
 - Node.js (Latest LTS version recommended)
 - npm or yarn package manager
+- Clipcafe API key (Get it from Clipcafe)
 
 ### Installation
 
@@ -40,21 +41,28 @@ git clone https://github.com/efesezen1/v-movie-quiz.git
 cd v-movie-quiz
 ```
 
-2. Install dependencies
+2. Set up environment variables
+- Copy `.env.example` to `.env`
+- Add your Clipcafe API key to the `.env` file:
+```bash
+VITE_APP_API_KEY=your_clipcafe_api_key_here
+```
+
+3. Install dependencies
 ```bash
 npm install
 # or
 yarn install
 ```
 
-3. Start the development server
+4. Start the development server
 ```bash
 npm run dev
 # or
 yarn dev
 ```
 
-4. Build for production
+5. Build for production
 ```bash
 npm run build
 # or
