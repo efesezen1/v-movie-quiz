@@ -22,6 +22,11 @@ A dynamic and interactive movie trivia game built with Vue 3 and Vite, featuring
 - Vue Query for data fetching
 - Axios for API requests
 
+![Main Page](./public/main.jpeg)
+![Trivia Page](./public/trivia.jpeg)
+![Movie Page](./public/movie.jpeg)
+
+
 ## Getting Started 🚀
 
 ### Prerequisites
